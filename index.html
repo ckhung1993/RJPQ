@@ -1,0 +1,2525 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>茱羅跳台協作工具 | MapleStory Romeo &amp; Juliet PQ Tool</title>
+<meta name="description" content="專為楓之谷 Artale 羅密歐與茱麗葉（羅朱）組隊任務打造的茱羅跳台協作工具，支援多人即時同步標記樓層。">
+<meta name="keywords" content="楓之谷, Artale, 羅密歐與茱麗葉, 羅朱, 跳台, 協作, 遊戲工具, 即時同步">
+<meta property="og:title" content="茱羅跳台協作工具 | MapleStory Romeo &amp; Juliet PQ Tool">
+<meta property="og:description" content="專為楓之谷 Artale 羅朱組隊任務打造的多人即時同步跳台協作工具。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<style>
+:root {
+  --primary: #6366f1;
+  --primary-hover: #5558e6;
+  --primary-light: rgba(99, 102, 241, 0.15);
+  --color-orange: #ff9800;
+  --color-blue: #2196f3;
+  --color-pink: #e91e63;
+  --color-green: #4caf50;
+  --danger: #ef4444;
+  --danger-hover: #dc2626;
+  --success: #22c55e;
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --surface: rgba(255, 255, 255, 0.06);
+  --surface-hover: rgba(255, 255, 255, 0.1);
+  --surface-card: rgba(255, 255, 255, 0.07);
+  --border: rgba(255, 255, 255, 0.1);
+  --border-focus: rgba(99, 102, 241, 0.5);
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-xs: 8px;
+  --font: 'Outfit', -apple-system, 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+}
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: var(--font);
+  background: linear-gradient(135deg, #0f0a1a 0%, #1a1030 30%, #0d1628 60%, #0a0a1a 100%);
+  color: var(--text-primary);
+  min-height: 100vh;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: radial-gradient(circle at 30% 20%, rgba(99, 102, 241, 0.06) 0%, transparent 50%),
+                    radial-gradient(circle at 70% 40%, rgba(129, 140, 248, 0.04) 0%, transparent 50%),
+                    radial-gradient(circle at 50% 80%, rgba(167, 139, 250, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+#noise-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+}
+
+/* App Container */
+.app-container {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+/* Characters */
+.characters-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  width: 100%;
+  max-width: 420px;
+  margin-bottom: -24px;
+  padding: 0 24px;
+  position: relative;
+  z-index: 2;
+}
+
+.char-img {
+  height: 96px;
+  width: auto;
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.char-img.left  { animation-delay: 0.10s; }
+.char-img.right { animation-delay: 0.25s; }
+
+/* Glass Card */
+.glass-card {
+  background: var(--surface-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 36px 32px;
+  box-shadow: var(--shadow), 0 0 60px rgba(99, 102, 241, 0.08);
+  width: 100%;
+  max-width: 420px;
+  animation: fadeInUp 0.5s ease-out;
+  position: relative;
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: 20px; right: 20px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.3), transparent);
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Logo */
+.logo {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.logo .ph-fill.ph-magic-wand {
+  display: none;
+}
+
+.logo-icon {
+  font-size: 44px;
+  margin-bottom: 10px;
+  filter: drop-shadow(0 0 16px rgba(99, 102, 241, 0.6));
+  animation: iconFloat 3s ease-in-out infinite;
+}
+
+@keyframes iconFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.logo h1 {
+  font-size: 28px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #6366f1, #a78bfa, #e2e8f0, #818cf8);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 4s ease infinite;
+  letter-spacing: 2px;
+  text-shadow: none;
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.logo .subtitle {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 6px;
+  text-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  background: rgba(255,255,255,0.04);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  color: var(--text-primary);
+  background: rgba(255,255,255,0.05);
+}
+
+.tab-btn.active {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
+}
+
+/* Forms */
+.form-panel {
+  display: none;
+}
+
+.form-panel.active {
+  display: block;
+  animation: fadeIn 0.25s ease;
+}
+
+.input-group {
+  margin-bottom: 14px;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-wrapper i {
+  position: absolute;
+  left: 14px;
+  color: var(--text-muted);
+  font-size: 18px;
+  pointer-events: none;
+  z-index: 1;
+  transition: color 0.2s ease;
+}
+
+.input-wrapper:focus-within i {
+  color: var(--primary);
+}
+
+.input-wrapper input {
+  width: 100%;
+  padding: 13px 14px 13px 42px;
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--text-primary);
+  background: rgba(255,255,255,0.05);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-xs);
+  outline: none;
+  transition: all 0.2s ease;
+  letter-spacing: 2px;
+}
+
+.input-wrapper input::placeholder {
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+.input-wrapper input:focus {
+  border-color: var(--border-focus);
+  background: rgba(99, 102, 241, 0.06);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Buttons */
+.primary-btn {
+  width: 100%;
+  padding: 13px 20px;
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--primary);
+  border: none;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.primary-btn:hover {
+  background: var(--primary-hover);
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+  transform: translateY(-1px);
+}
+
+.primary-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+.primary-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.primary-btn i {
+  font-size: 18px;
+}
+
+/* Links */
+.help-links {
+  margin-top: 20px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.help-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.help-link:hover {
+  color: var(--primary);
+}
+
+.help-link i {
+  font-size: 16px;
+}
+
+/* Credit */
+.credit {
+  text-align: center;
+  margin-top: 18px;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.credit span {
+  display: block;
+}
+
+/* Room Screen */
+.view-screen {
+  display: none;
+}
+
+.view-screen.active {
+  display: block;
+}
+
+.view-screen.hidden {
+  display: none;
+}
+
+/* ── Room Card: auto-adapt width ── */
+.room-card {
+  max-width: min(920px, 95vw);
+  width: 100%;
+}
+
+/* Room Header */
+.room-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 12px;
+}
+
+.room-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pulse-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #22c55e;
+  flex-shrink: 0;
+  animation: pulse 2s infinite;
+}
+
+.pulse-dot.reconnecting {
+  background: #f59e0b;
+  animation: pulse 1s infinite;
+}
+
+.pulse-dot.disconnected {
+  background: #ef4444;
+  animation: none;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.3); }
+}
+
+.room-label {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: 0.5px;
+}
+
+#display-room-code {
+  color: var(--primary);
+  font-weight: 800;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.user-info .avatar {
+  font-size: 18px;
+}
+
+.room-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.icon-btn {
+  width: 38px;
+  height: 38px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text-secondary);
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: all 0.2s ease;
+  font-family: var(--font);
+}
+
+.icon-btn:hover {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+}
+
+.icon-btn.danger {
+  border-color: rgba(239, 68, 68, 0.3);
+  color: var(--danger);
+}
+
+.icon-btn.danger:hover {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+/* Room Body */
+.room-body {
+  display: flex;
+  gap: 20px;
+}
+
+/* Control Panel */
+.control-panel {
+  width: 210px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.control-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.control-subtitle {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: -8px;
+  line-height: 1.4;
+}
+
+/* Color Picker */
+.color-picker {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.color-option {
+  padding: 12px 8px;
+  border: 2px solid transparent;
+  border-radius: var(--radius-xs);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-family: var(--font);
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  position: relative;
+}
+
+.color-option:hover:not(.taken):not(.selected) {
+  background: var(--surface-hover);
+  transform: translateY(-1px);
+}
+
+.color-option.selected[data-color="orange"] { border-color: var(--color-orange); color: var(--color-orange); background: rgba(255,152,0,0.12); }
+.color-option.selected[data-color="blue"]   { border-color: var(--color-blue); color: var(--color-blue); background: rgba(33,150,243,0.12); }
+.color-option.selected[data-color="pink"]   { border-color: var(--color-pink); color: var(--color-pink); background: rgba(233,30,99,0.12); }
+.color-option.selected[data-color="green"]  { border-color: var(--color-green); color: var(--color-green); background: rgba(76,175,80,0.12); }
+
+.color-option.taken {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Path Display */
+.path-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+#my-path-input {
+  width: 100%;
+  padding: 10px 12px;
+  font-family: 'Courier New', 'Menlo', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: rgba(0,0,0,0.3);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-xs);
+  outline: none;
+  letter-spacing: 2px;
+  text-align: center;
+}
+
+.action-btn {
+  width: 100%;
+  padding: 8px 12px;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+}
+
+.action-btn.warn {
+  border-color: rgba(239, 68, 68, 0.25);
+  color: rgba(239, 68, 68, 0.7);
+}
+
+.action-btn.warn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+}
+
+/* Grid */
+.grid-panel {
+  flex: 1;
+  min-width: 0;
+}
+
+.grid-header {
+  display: grid;
+  grid-template-columns: 44px repeat(4, 1fr);
+  gap: 4px;
+  margin-bottom: 6px;
+  padding: 0 2px;
+}
+
+.grid-header-cell {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 4px 0;
+  border-radius: 4px;
+}
+
+.grid-header-cell[data-color="orange"] { color: var(--color-orange); }
+.grid-header-cell[data-color="blue"]   { color: var(--color-blue); }
+.grid-header-cell[data-color="pink"]   { color: var(--color-pink); }
+.grid-header-cell[data-color="green"]  { color: var(--color-green); }
+
+.grid-body {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.grid-row {
+  display: grid;
+  grid-template-columns: 44px repeat(4, 1fr);
+  gap: 4px;
+  align-items: center;
+}
+
+.row-label {
+  text-align: center;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-secondary);
+  user-select: none;
+}
+
+.door-btn {
+  width: 100%;
+  height: 38px;
+  min-width: 0;
+  border: 1.5px solid var(--border);
+  border-radius: 5px;
+  background: rgba(255,255,255,0.04);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--font);
+  color: rgba(255,255,255,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  user-select: none;
+}
+
+.door-btn.marked {
+  color: rgba(255,255,255,0.7);
+  font-size: 15px;
+}
+
+.door-btn:hover:not(.locked) {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.2);
+}
+
+.door-btn.locked {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.door-btn.marked.orange { background: rgba(255,152,0,0.35); border-color: var(--color-orange); box-shadow: 0 0 8px rgba(255,152,0,0.3); }
+.door-btn.marked.blue   { background: rgba(33,150,243,0.35); border-color: var(--color-blue); box-shadow: 0 0 8px rgba(33,150,243,0.3); }
+.door-btn.marked.pink   { background: rgba(233,30,99,0.35); border-color: var(--color-pink); box-shadow: 0 0 8px rgba(233,30,99,0.3); }
+.door-btn.marked.green  { background: rgba(76,175,80,0.35); border-color: var(--color-green); box-shadow: 0 0 8px rgba(76,175,80,0.3); }
+
+/* Error marker on door buttons */
+.error-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 16px;
+  height: 16px;
+  color: #fff;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  z-index: 2;
+}
+
+.door-btn.has-error {
+  position: relative;
+}
+
+.error-tooltip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1f1a2e;
+  border: 1px solid #ef4444;
+  color: #fca5a5;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 3px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 10;
+}
+
+.door-btn.has-error:hover .error-tooltip {
+  opacity: 1;
+}
+
+/* Chat Panel */
+.chat-panel {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.chat-messages {
+  max-height: 120px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  padding-right: 4px;
+}
+
+.chat-messages::-webkit-scrollbar { width: 3px; }
+.chat-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+.chat-msg {
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.chat-msg .name {
+  font-weight: 700;
+}
+
+.chat-msg.system {
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: 11px;
+}
+
+.chat-input-row {
+  display: flex;
+  gap: 6px;
+}
+
+.chat-input {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 6px 10px;
+  color: var(--text-primary);
+  font-family: var(--font);
+  font-size: 12px;
+  outline: none;
+}
+
+.chat-input::placeholder { color: var(--text-muted); }
+
+.chat-send-btn {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 6px 14px;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.chat-send-btn:hover { opacity: 0.85; }
+
+/* Room Footer */
+.room-footer {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.8;
+}
+
+/* Role Panel */
+.role-panel {
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.role-panel-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.role-input-row {
+  display: flex;
+  gap: 6px;
+}
+
+.role-input {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 7px 10px;
+  color: var(--text-primary);
+  font-family: var(--font);
+  font-size: 12px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.role-input:focus {
+  border-color: var(--primary);
+}
+
+.role-input::placeholder {
+  color: var(--text-muted);
+}
+
+.role-confirm-btn {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 7px 12px;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  white-space: nowrap;
+}
+
+.role-confirm-btn:hover {
+  opacity: 0.85;
+}
+
+.role-assignments {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.role-assign-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 8px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.role-assign-color {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+}
+
+.role-assign-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.role-assign-dot.orange { background: var(--color-orange); }
+.role-assign-dot.blue   { background: var(--color-blue); }
+.role-assign-dot.pink   { background: var(--color-pink); }
+.role-assign-dot.green  { background: var(--color-green); }
+
+.role-assign-id {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.role-assign-empty {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-style: italic;
+}
+
+.my-role-display {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: rgba(99,102,241,0.08);
+  border: 1px solid rgba(99,102,241,0.2);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  display: none;
+}
+
+.my-role-display.visible {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.my-role-display .ph {
+  font-size: 16px;
+  color: var(--primary);
+}
+
+/* Modal / Overlay */
+.overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.overlay.hidden {
+  display: none;
+}
+
+.modal-card {
+  background: #1a1530;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px 24px;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  position: relative;
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: var(--surface);
+  color: var(--text-secondary);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+}
+
+.modal-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 18px;
+  text-align: center;
+}
+
+/* Help Steps */
+.help-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.help-step {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.step-text {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  padding-top: 3px;
+}
+
+.warning-box {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.warning-box i {
+  color: var(--danger);
+  font-size: 20px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.warning-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--danger);
+  margin-bottom: 3px;
+}
+
+.warning-text {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Loading */
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 14px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  text-align: center;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* Toast */
+#toast-container {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.toast {
+  padding: 12px 20px;
+  border-radius: var(--radius-xs);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: toastIn 0.3s ease-out;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  pointer-events: auto;
+  max-width: 360px;
+}
+
+.toast.success {
+  background: rgba(34,197,94,0.15);
+  border: 1px solid rgba(34,197,94,0.35);
+  color: #4ade80;
+}
+
+.toast.error {
+  background: rgba(239,68,68,0.15);
+  border: 1px solid rgba(239,68,68,0.35);
+  color: #f87171;
+}
+
+.toast.fade-out {
+  animation: toastOut 0.3s ease-in forwards;
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(-12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes toastOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-12px); }
+}
+
+/* ── Responsive: Mobile (≤768px) ── */
+@media (max-width: 768px) {
+  .app-container {
+    padding: 12px;
+    align-items: flex-start;
+    padding-top: 20px;
+  }
+
+  .glass-card {
+    padding: 24px 18px;
+    max-width: 100%;
+    border-radius: 14px;
+  }
+
+  .room-card {
+    max-width: 100%;
+    padding: 18px 14px;
+  }
+
+  .room-body {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .control-panel {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .control-title,
+  .control-subtitle {
+    width: 100%;
+  }
+
+  .color-picker {
+    grid-template-columns: repeat(4, 1fr);
+    width: 100%;
+  }
+
+  .path-section {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .path-section #my-path-input {
+    flex: 1;
+    min-width: 140px;
+  }
+
+  .path-section .action-btn {
+    flex: 1;
+    min-width: 90px;
+  }
+
+  .hide-on-mobile {
+    display: none;
+  }
+
+  .grid-panel {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .grid-header {
+    grid-template-columns: 30px repeat(4, 1fr);
+    gap: 3px;
+  }
+
+  .grid-row {
+    grid-template-columns: 30px repeat(4, 1fr);
+    gap: 3px;
+  }
+
+  .grid-header-cell {
+    font-size: 11px;
+  }
+
+  .row-label {
+    font-size: 13px;
+  }
+
+  .door-btn {
+    height: 24px;
+    font-size: 11px;
+  }
+
+  .door-btn.marked {
+    font-size: 12px;
+  }
+
+  .logo h1 {
+    font-size: 22px;
+    letter-spacing: 1.5px;
+  }
+
+  .logo .subtitle {
+    font-size: 10px;
+    letter-spacing: 2px;
+  }
+
+  .room-label {
+    font-size: 15px;
+  }
+
+  .room-header {
+    gap: 8px;
+  }
+}
+
+/* ── Small phones (≤400px) ── */
+@media (max-width: 400px) {
+  .glass-card {
+    padding: 18px 12px;
+  }
+
+  .room-card {
+    padding: 14px 10px;
+  }
+
+  .grid-header {
+    grid-template-columns: 24px repeat(4, 1fr);
+    gap: 2px;
+  }
+
+  .grid-row {
+    grid-template-columns: 24px repeat(4, 1fr);
+    gap: 2px;
+  }
+
+  .door-btn {
+    height: 22px;
+    border-radius: 4px;
+    font-size: 10px;
+  }
+
+  .door-btn.marked {
+    font-size: 11px;
+  }
+
+  .row-label {
+    font-size: 11px;
+  }
+
+  .room-header {
+    flex-wrap: wrap;
+  }
+
+  .color-option {
+    font-size: 15px;
+    padding: 8px 6px;
+  }
+
+  .primary-btn {
+    font-size: 14px;
+    padding: 11px 16px;
+  }
+
+  .tabs {
+    gap: 2px;
+  }
+
+  .tab-btn {
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+}
+
+/* ── Large desktop (≥1200px) ── */
+@media (min-width: 1200px) {
+  .room-card {
+    max-width: min(1020px, 90vw);
+  }
+
+  .room-body {
+    gap: 28px;
+  }
+
+  .control-panel {
+    width: 240px;
+  }
+}
+
+/* ── Extra large desktop (≥1600px) ── */
+@media (min-width: 1600px) {
+  .room-card {
+    max-width: min(1120px, 85vw);
+  }
+
+  .control-panel {
+    width: 260px;
+  }
+}
+</style>
+</head>
+<body>
+
+<div id="noise-overlay"></div>
+
+<div class="app-container">
+
+  <!-- HOME SCREEN -->
+  <div id="home-screen" class="view-screen active">
+    <div class="characters-row">
+      <img class="char-img left" src="data:image/png;base64,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" alt="茱麗葉">
+      <img class="char-img right" src="data:image/png;base64,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" alt="羅密歐">
+    </div>
+    <div class="glass-card">
+      <div class="logo">
+        <div class="logo-icon">✨</div>
+        <h1>茱羅跳台協作工具</h1>
+        <p class="subtitle">MapleStory Romeo &amp; Juliet PQ Tool</p>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" data-target="create-form">建立房間</button>
+        <button class="tab-btn" data-target="join-form">進入房間</button>
+      </div>
+
+      <!-- Create Form -->
+      <div id="create-form" class="form-panel active">
+        <div class="input-group">
+          <div class="input-wrapper">
+            <i class="ph ph-lock-key"></i>
+            <input type="password" id="create-password" placeholder="設定密碼 2-4 位數字"
+                   inputmode="numeric" maxlength="4" autocomplete="off">
+          </div>
+        </div>
+        <button class="primary-btn create-btn" id="create-btn">
+          <i class="ph ph-plus-circle"></i> 建立 (Create)
+        </button>
+      </div>
+
+      <!-- Join Form -->
+      <div id="join-form" class="form-panel">
+        <div class="input-group">
+          <div class="input-wrapper">
+            <i class="ph ph-door"></i>
+            <input type="text" id="join-code" placeholder="房號 6 碼"
+                   inputmode="numeric" autocomplete="off">
+          </div>
+        </div>
+        <div class="input-group">
+          <div class="input-wrapper">
+            <i class="ph ph-lock-key"></i>
+            <input type="password" id="join-password" placeholder="密碼 2-4 位數字"
+                   inputmode="numeric" maxlength="4" autocomplete="off">
+          </div>
+        </div>
+        <button class="primary-btn join-btn" id="join-btn">
+          <i class="ph ph-sign-in"></i> 進入 (Join)
+        </button>
+      </div>
+
+      <div class="help-links">
+        <a class="help-link" id="help-btn">
+          <i class="ph ph-question"></i> 小工具使用說明
+        </a>
+      </div>
+
+      <div class="credit">
+        <span>&copy; 2026 KaHung#MdvQYE All rights reserved.</span>
+        <span>版本：v1.5.0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROOM SCREEN -->
+  <div id="room-screen" class="view-screen hidden">
+    <div class="glass-card room-card">
+      <div class="room-header">
+        <div class="room-info">
+          <div class="pulse-dot reconnecting" id="pulse-dot"></div>
+          <span class="room-label">Room: <span id="display-room-code">------</span></span>
+          <div class="user-info">
+            <span class="avatar">👤</span>
+            <span id="my-name">連線中...</span>
+          </div>
+        </div>
+        <div class="room-actions">
+          <button class="icon-btn" id="copy-btn" title="複製房間資訊">
+            <i class="ph ph-copy"></i>
+          </button>
+          <button class="icon-btn danger" id="home-btn" title="退出房間">
+            <i class="ph ph-sign-out"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="room-body">
+        <div class="control-panel">
+          <div class="control-title hide-on-mobile">選擇顏色 / 房號</div>
+          <div class="control-subtitle hide-on-mobile">請選定一個代表你的房間與顏色（只有你選擇後，才能編輯階梯）</div>
+
+          <div class="color-picker" id="color-picker">
+            <button class="color-option" data-color="orange">101</button>
+            <button class="color-option" data-color="blue">102</button>
+            <button class="color-option" data-color="pink">103</button>
+            <button class="color-option" data-color="green">104</button>
+          </div>
+
+          <div class="my-role-display" id="my-role-display">
+            <i class="ph ph-identification-card"></i>
+            <span id="my-role-text"></span>
+          </div>
+
+          <div class="role-panel">
+            <div class="role-panel-title">
+              <i class="ph ph-user-circle"></i> 角色登入
+            </div>
+            <div class="role-input-row">
+              <input type="text" class="role-input" id="role-input" placeholder="輸入角色 ID（例如：ArcherKing）" maxlength="20">
+              <button class="role-confirm-btn" id="role-confirm-btn">登入</button>
+            </div>
+            <div class="role-assignments" id="role-assignments">
+              <div class="role-assign-item">
+                <div class="role-assign-color">
+                  <span class="role-assign-dot orange"></span> 101
+                </div>
+                <span class="role-assign-empty">未分配</span>
+              </div>
+              <div class="role-assign-item">
+                <div class="role-assign-color">
+                  <span class="role-assign-dot blue"></span> 102
+                </div>
+                <span class="role-assign-empty">未分配</span>
+              </div>
+              <div class="role-assign-item">
+                <div class="role-assign-color">
+                  <span class="role-assign-dot pink"></span> 103
+                </div>
+                <span class="role-assign-empty">未分配</span>
+              </div>
+              <div class="role-assign-item">
+                <div class="role-assign-color">
+                  <span class="role-assign-dot green"></span> 104
+                </div>
+                <span class="role-assign-empty">未分配</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="path-section">
+            <input type="text" id="my-path-input" readonly placeholder="尚未標記任何階梯...">
+            <button class="action-btn" id="copy-path-btn">
+              <i class="ph ph-copy"></i> 複製路線
+            </button>
+            <button class="action-btn warn" id="clear-all-btn">
+              <i class="ph ph-arrow-counter-clockwise"></i> 重新開始
+            </button>
+          </div>
+        </div>
+
+        <div class="grid-panel" id="grid-container">
+          <div class="grid-header">
+            <div></div>
+            <div class="grid-header-cell" data-color="orange">101</div>
+            <div class="grid-header-cell" data-color="blue">102</div>
+            <div class="grid-header-cell" data-color="pink">103</div>
+            <div class="grid-header-cell" data-color="green">104</div>
+          </div>
+          <div class="grid-body" id="grid-body">
+          </div>
+        </div>
+      </div>
+
+      <div class="room-footer" id="footer-copy-text">
+        Code: ------ | Password: ---- | Share exactly how it feels.
+      </div>
+
+      <div class="chat-panel">
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-input-row">
+          <input type="text" class="chat-input" id="chat-input" placeholder="輸入訊息..." maxlength="200">
+          <button class="chat-send-btn" id="chat-send-btn">發送</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- HELP MODAL -->
+<div id="help-modal" class="overlay hidden">
+  <div class="modal-card">
+    <button class="modal-close" id="help-close"><i class="ph ph-x"></i></button>
+    <div class="modal-title">使用說明</div>
+    <div class="help-steps">
+      <div class="help-step">
+        <div class="step-num">1</div>
+        <div class="step-text">由一名玩家建立房間，並將房號與密碼給隊友</div>
+      </div>
+      <div class="help-step">
+        <div class="step-num">2</div>
+        <div class="step-text">加入房間後，每人選擇好自己負責的房門（101-104）</div>
+      </div>
+      <div class="help-step">
+        <div class="step-num">3</div>
+        <div class="step-text">找到對的平台時，直接點擊對應的數字方塊作記號</div>
+      </div>
+      <div class="help-step">
+        <div class="step-num">4</div>
+        <div class="step-text">點擊後路徑將即時同步，全隊可以無痛共享路線</div>
+      </div>
+    </div>
+    <div class="warning-box">
+      <i class="ph-fill ph-warning-circle"></i>
+      <div>
+        <div class="warning-title">房間自動關閉機制</div>
+        <div class="warning-text">只要房間 <strong>超過 20 分鐘</strong> 沒有人點亮/取消任何格子（沒有資料更新），系統便會將房間視為閒置並自動刪除關閉。</div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- LOADING OVERLAY -->
+<div id="loading" class="overlay hidden">
+  <div class="modal-card" style="text-align:center; background: transparent; border: none; box-shadow: none;">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loading-text">建立房間中...</div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div id="toast-container"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  // ⚠️ 請替換成你自己的 Supabase 專案 URL 和 anon key
+  // 到 https://supabase.com 建立專案後，在 Settings > API 頁面可以找到
+  const SUPABASE_URL = 'https://lpcpzrslspgxlyuodhng.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxwY3B6cnNsc3BneGx5dW9kaG5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxNzgxNzAsImV4cCI6MjA5ODc1NDE3MH0.BvGzqcR9Z5YAfokEZhEon8bt3spIefxiCTwHautbZjQ';
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // ─── Constants ───
+  const GRID_ROWS = 10;
+  const GRID_COLS = 4;
+  const COLORS = ['orange', 'blue', 'pink', 'green'];
+  const COLOR_LABELS = { orange: '101', blue: '102', pink: '103', green: '104' };
+  const ROOM_IDLE_TIMEOUT = 20 * 60 * 1000;
+
+  // ─── State ───
+  let state = {
+    screen: 'home',
+    roomCode: null,
+    password: null,
+    isHost: false,
+    myColor: null,
+    myId: crypto.randomUUID(),
+    players: {},
+    colors: { orange: null, blue: null, pink: null, green: null },
+    roles: { orange: null, blue: null, pink: null, green: null },
+    myRoleId: null,
+    errors: {},
+    messages: [],
+    grid: Array.from({ length: GRID_ROWS }, () => Array(GRID_COLS).fill(null)),
+    lastActivity: Date.now()
+  };
+
+  let channel = null;
+  let syncing = false;
+
+  // ─── DOM Refs ───
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => document.querySelectorAll(s);
+
+  const homeScreen = $('#home-screen');
+  const roomScreen = $('#room-screen');
+  const createForm = $('#create-form');
+  const joinForm = $('#join-form');
+  const createPassword = $('#create-password');
+  const joinCode = $('#join-code');
+  const joinPassword = $('#join-password');
+  const createBtn = $('#create-btn');
+  const joinBtn = $('#join-btn');
+  const displayRoomCode = $('#display-room-code');
+  const pulseDot = $('#pulse-dot');
+  const myName = $('#my-name');
+  const colorPicker = $('#color-picker');
+  const myPathInput = $('#my-path-input');
+  const gridBody = $('#grid-body');
+  const footerCopyText = $('#footer-copy-text');
+  const helpModal = $('#help-modal');
+  const loadingOverlay = $('#loading');
+  const loadingText = $('#loading-text');
+  const toastContainer = $('#toast-container');
+  const roleInput = $('#role-input');
+  const roleConfirmBtn = $('#role-confirm-btn');
+  const roleAssignments = $('#role-assignments');
+  const myRoleDisplay = $('#my-role-display');
+  const myRoleText = $('#my-role-text');
+  const chatMessages = $('#chat-messages');
+  const chatInput = $('#chat-input');
+  const chatSendBtn = $('#chat-send-btn');
+
+  // ─── Supabase Real-time ───
+  function subscribeToRoom(roomCode) {
+    if (channel) {
+      supabase.removeChannel(channel);
+      channel = null;
+    }
+
+    channel = supabase
+      .channel('room:' + roomCode)
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'rooms', filter: 'room_code=eq.' + roomCode },
+        (payload) => {
+          if (payload.new && payload.new.state) {
+            applyRemoteState(payload.new.state);
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'rooms', filter: 'room_code=eq.' + roomCode },
+        () => {
+          handleRoomClosed();
+        }
+      )
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          setConnected(true);
+        } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
+          setConnected(false);
+        }
+      });
+  }
+
+  function unsubscribeRoom() {
+    if (channel) {
+      supabase.removeChannel(channel);
+      channel = null;
+    }
+  }
+
+  async function createRoomOnDB(roomCode, password) {
+    const roomState = getRoomState();
+    const now = new Date().toISOString();
+    const { error } = await supabase.from('rooms').insert({
+      room_code: roomCode,
+      password: password,
+      state: roomState,
+      grid_activity: now,
+      updated_at: now
+    });
+
+    if (error) {
+      console.error('Create room error:', error);
+      showToast('建立房間失敗，請再試一次', 'error');
+      return false;
+    }
+    return true;
+  }
+
+  async function joinRoomOnDB(roomCode, password) {
+    const { data, error } = await supabase
+      .from('rooms')
+      .select('state')
+      .eq('room_code', roomCode)
+      .single();
+
+    if (error || !data) {
+      showToast('房間不存在或已關閉', 'error');
+      return false;
+    }
+
+    const srvState = data.state;
+    // Check password (stored in state for simplicity, or we can check db column)
+    // Actually password is separate column, let's do a separate check
+    const { data: roomData, error: roomError } = await supabase
+      .from('rooms')
+      .select('password')
+      .eq('room_code', roomCode)
+      .single();
+
+    if (roomError || !roomData) {
+      showToast('房間不存在', 'error');
+      return false;
+    }
+
+    if (roomData.password !== password) {
+      showToast('密碼錯誤！', 'error');
+      return false;
+    }
+
+    applyRemoteState(srvState);
+    return true;
+  }
+
+  function getRoomState() {
+    return {
+      grid: state.grid,
+      colors: state.colors,
+      roles: state.roles,
+      errors: state.errors,
+      messages: state.messages,
+      players: state.players
+    };
+  }
+
+  async function syncToServer() {
+    if (syncing || !state.roomCode) return;
+    syncing = true;
+
+    try {
+      const roomState = getRoomState();
+      const { error } = await supabase
+        .from('rooms')
+        .update({
+          state: roomState,
+          grid_activity: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .eq('room_code', state.roomCode);
+
+      if (error) {
+        console.error('Sync error:', error);
+        if (error.code === 'PGRST116') {
+          // Row not found - room was deleted
+          handleRoomClosed();
+        }
+      }
+    } catch (e) {
+      console.error('Sync exception:', e);
+    }
+
+    syncing = false;
+  }
+
+  function handleRoomClosed() {
+    unsubscribeRoom();
+    showToast('房間已關閉（超過 20 分鐘無操作或已被刪除）', 'info');
+    setTimeout(() => {
+      leaveRoom();
+    }, 1500);
+  }
+
+  function applyRemoteState(srv) {
+    state.players = { ...srv.players };
+    state.colors = { ...srv.colors };
+    state.roles = JSON.parse(JSON.stringify(srv.roles || {}));
+    state.errors = JSON.parse(JSON.stringify(srv.errors || {}));
+    const msgChanged = JSON.stringify(state.messages) !== JSON.stringify(srv.messages || []);
+    state.messages = JSON.parse(JSON.stringify(srv.messages || []));
+
+    const gridChanged = !gridEquals(state.grid, srv.grid);
+    if (gridChanged) {
+      state.grid = srv.grid.map(row => [...row]);
+    }
+
+    if (!state.myColor || state.colors[state.myColor] !== state.myId) {
+      state.myColor = null;
+      for (const c of COLORS) {
+        if (state.colors[c] === state.myId) {
+          state.myColor = c;
+          break;
+        }
+      }
+    }
+
+    setConnected(true);
+    renderColorPicker();
+    renderGrid();
+    updatePathDisplay();
+    updateRoomHeader();
+    renderRoleAssignments();
+    if (msgChanged) renderChat();
+  }
+
+  async function leaveRoomOnDB() {
+    if (!state.roomCode) return;
+    try {
+      // Remove myself from players and colors
+      const updated = { ...state };
+      delete updated.players[state.myId];
+      for (const c of COLORS) {
+        if (updated.colors[c] === state.myId) updated.colors[c] = null;
+        if (updated.roles[c] === state.myRoleId) updated.roles[c] = null;
+      }
+
+      const { error } = await supabase
+        .from('rooms')
+        .update({
+          state: { grid: updated.grid, colors: updated.colors, roles: updated.roles, errors: updated.errors, messages: updated.messages, players: updated.players },
+          updated_at: new Date().toISOString()
+        })
+        .eq('room_code', state.roomCode);
+
+      if (error) console.error('Leave error:', error);
+    } catch (e) {}
+  }
+
+  // ─── Navigation ───
+  function showScreen(screen) {
+    state.screen = screen;
+    homeScreen.classList.toggle('active', screen === 'home');
+    homeScreen.classList.toggle('hidden', screen !== 'home');
+    roomScreen.classList.toggle('active', screen === 'room');
+    roomScreen.classList.toggle('hidden', screen !== 'room');
+
+    if (screen === 'room') {
+      renderGrid();
+      updatePathDisplay();
+      updateRoomHeader();
+      renderRoleAssignments();
+    }
+  }
+
+  function showLoading(text) {
+    loadingText.textContent = text;
+    loadingOverlay.classList.remove('hidden');
+  }
+
+  function hideLoading() {
+    loadingOverlay.classList.add('hidden');
+  }
+
+  // ─── Toast ───
+  function showToast(message, type) {
+    const toast = document.createElement('div');
+    toast.className = 'toast ' + type;
+    const icon = type === 'success' ? 'ph-bold ph-check' : 'ph-fill ph-warning-circle';
+    toast.innerHTML = '<i class="' + icon + '"></i> ' + message;
+    toastContainer.appendChild(toast);
+
+    setTimeout(() => {
+      toast.classList.add('fade-out');
+      toast.addEventListener('animationend', () => toast.remove());
+    }, 2800);
+  }
+
+  // ─── Validation ───
+  function isValidPassword(pw) { return /^\d{2,4}$/.test(pw); }
+  function isValidCode(code) { return /^\d{6}$/.test(code); }
+
+  function formatRoomCode(code) {
+    if (!code || code.length !== 6) return code || '--- ---';
+    return code.slice(0, 3) + ' ' + code.slice(3);
+  }
+
+  function cleanRoomCode(input) { return input.replace(/\s/g, ''); }
+
+  // ─── Room Management ───
+  function generateCode() { return String(Math.floor(100000 + Math.random() * 900000)); }
+
+  async function createRoom(password) {
+    if (!SUPABASE_URL || SUPABASE_URL === 'YOUR_SUPABASE_URL') {
+      showToast('請先在代碼中設定 SUPABASE_URL 和 SUPABASE_ANON_KEY！', 'error');
+      return;
+    }
+
+    showLoading('建立房間中...');
+    const code = generateCode();
+    state.roomCode = code;
+    state.password = password;
+    state.isHost = true;
+    state.myColor = null;
+    state.players = { [state.myId]: true };
+    state.colors = { orange: null, blue: null, pink: null, green: null };
+    state.roles = { orange: null, blue: null, pink: null, green: null };
+    state.myRoleId = null;
+    state.errors = {};
+    state.grid = Array.from({ length: GRID_ROWS }, () => Array(GRID_COLS).fill(null));
+    state.lastActivity = Date.now();
+    state.messages = [];
+
+    const ok = await createRoomOnDB(code, password);
+    if (!ok) {
+      hideLoading();
+      return;
+    }
+
+    subscribeToRoom(code);
+    hideLoading();
+    showScreen('room');
+    updateRoomHeader();
+    updateFooterInfo();
+    addSystemMsg('房間已建立');
+    showToast('房間建立成功！', 'success');
+    setConnected(true);
+  }
+
+  async function joinRoom(code, password) {
+    if (!SUPABASE_URL || SUPABASE_URL === 'YOUR_SUPABASE_URL') {
+      showToast('請先在代碼中設定 SUPABASE_URL 和 SUPABASE_ANON_KEY！', 'error');
+      return;
+    }
+
+    showLoading('連接房間中...');
+    state.roomCode = code;
+    state.password = password;
+    state.isHost = false;
+    state.myColor = null;
+    state.players = {};
+    state.colors = { orange: null, blue: null, pink: null, green: null };
+    state.roles = { orange: null, blue: null, pink: null, green: null };
+    state.myRoleId = null;
+    state.errors = {};
+    state.grid = Array.from({ length: GRID_ROWS }, () => Array(GRID_COLS).fill(null));
+    state.messages = [];
+
+    const ok = await joinRoomOnDB(code, password);
+    if (!ok) {
+      hideLoading();
+      return;
+    }
+
+    // Subscribe and add myself
+    subscribeToRoom(code);
+    
+    // Add player to room
+    if (!state.players[state.myId]) {
+      state.players[state.myId] = true;
+      await syncToServer();
+    }
+
+    hideLoading();
+    showScreen('room');
+    updateRoomHeader();
+    updateFooterInfo();
+    addSystemMsg('一名玩家加入了房間');
+    showToast('成功加入房間！', 'success');
+    setConnected(true);
+  }
+
+  async function leaveRoom() {
+    await leaveRoomOnDB();
+    unsubscribeRoom();
+    clearRoomState();
+    showScreen('home');
+  }
+
+  function clearRoomState() {
+    state.roomCode = null;
+    state.password = null;
+    state.isHost = false;
+    state.myColor = null;
+    state.players = {};
+    state.colors = { orange: null, blue: null, pink: null, green: null };
+    state.grid = Array.from({ length: GRID_ROWS }, () => Array(GRID_COLS).fill(null));
+  }
+
+  // ─── Grid ───
+  function gridEquals(a, b) {
+    for (let r = 0; r < GRID_ROWS; r++) {
+      for (let c = 0; c < GRID_COLS; c++) {
+        if (a[r][c] !== b[r][c]) return false;
+      }
+    }
+    return true;
+  }
+
+  function pushMutation(type, payload) {
+    if (type === 'update_color') {
+      const { color } = payload;
+      if (state.colors[color] && state.colors[color] !== state.myId) {
+        showToast('這個顏色已經被其他人選走了，請選擇其他顏色！', 'error');
+        return false;
+      }
+      state.colors[color] = state.myId;
+    } else if (type === 'release_color') {
+      const { color } = payload;
+      if (state.colors[color] === state.myId) {
+        state.colors[color] = null;
+      }
+      state.myColor = null;
+    } else if (type === 'update_door') {
+      const { row, col, color } = payload;
+      for (let c = 0; c < GRID_COLS; c++) {
+        if (state.grid[row][c] === color) state.grid[row][c] = null;
+      }
+      state.grid[row][col] = color;
+      for (let c = 0; c < GRID_COLS; c++) {
+        const key = row + ',' + c;
+        if (state.errors[key] && state.errors[key][state.myId]) {
+          delete state.errors[key][state.myId];
+          if (Object.keys(state.errors[key]).length === 0) {
+            delete state.errors[key];
+          }
+        }
+      }
+    } else if (type === 'clear_door') {
+      const { row, col } = payload;
+      state.grid[row][col] = null;
+    } else if (type === 'clear_all_grid') {
+      state.grid = Array.from({ length: GRID_ROWS }, () => Array(GRID_COLS).fill(null));
+      state.errors = {};
+    }
+
+    syncToServer();
+    renderColorPicker();
+    renderGrid();
+    updatePathDisplay();
+    renderRoleAssignments();
+    return true;
+  }
+
+  // ─── UI Updates ───
+  function setConnected(connected) {
+    pulseDot.classList.remove('reconnecting', 'disconnected');
+    if (!connected) {
+      pulseDot.classList.add('disconnected');
+      myName.textContent = '連線中斷';
+    } else {
+      pulseDot.classList.remove('disconnected');
+    }
+  }
+
+  function updateRoomHeader() {
+    displayRoomCode.textContent = formatRoomCode(state.roomCode);
+    if (state.isHost) {
+      myName.textContent = '房主 Room Host';
+    } else {
+      myName.textContent = '成員 Member';
+    }
+  }
+
+  function updateFooterInfo() {
+    footerCopyText.textContent = 'Code: ' + formatRoomCode(state.roomCode) + ' | Password: ' + (state.password || '----') + ' | Share exactly how it feels.';
+  }
+
+  function renderColorPicker() {
+    const options = colorPicker.querySelectorAll('.color-option');
+    options.forEach(opt => {
+      const color = opt.dataset.color;
+      opt.classList.remove('selected', 'taken');
+      if (state.colors[color] === state.myId) {
+        opt.classList.add('selected');
+      } else if (state.colors[color] && state.colors[color] !== state.myId) {
+        opt.classList.add('taken');
+      }
+    });
+  }
+
+  function renderGrid() {
+    gridBody.innerHTML = '';
+    for (let r = 0; r < GRID_ROWS; r++) {
+      const rowDiv = document.createElement('div');
+      rowDiv.className = 'grid-row';
+
+      const label = document.createElement('div');
+      label.className = 'row-label';
+      label.textContent = GRID_ROWS - r;
+      rowDiv.appendChild(label);
+
+      for (let c = 0; c < GRID_COLS; c++) {
+        const btn = document.createElement('button');
+        btn.className = 'door-btn';
+        btn.textContent = c + 1;
+        const cellColor = state.grid[r][c];
+
+        if (cellColor) {
+          btn.classList.add('marked', cellColor);
+        }
+
+        const errKey = r + ',' + c;
+        if (state.errors[errKey] && Object.keys(state.errors[errKey]).length > 0) {
+          btn.classList.add('has-error');
+          const entries = Object.values(state.errors[errKey]);
+
+          const badge = document.createElement('span');
+          badge.className = 'error-badge';
+          badge.textContent = '\u2715';
+          const colorMap = { orange: '#ff9800', blue: '#2196f3', pink: '#e91e63', green: '#4caf50' };
+          const colors = entries.map(e => colorMap[e.color] || '#ef4444');
+          if (colors.length === 1) {
+            badge.style.backgroundColor = colors[0];
+          } else if (colors.length === 2) {
+            badge.style.background = 'linear-gradient(90deg, ' + colors[0] + ' 50%, ' + colors[1] + ' 50%)';
+          } else {
+            const stops = colors.map((cl, i) => cl + ' ' + (i / colors.length) * 100 + '% ' + ((i + 1) / colors.length) * 100 + '%').join(', ');
+            badge.style.background = 'conic-gradient(' + stops + ')';
+          }
+          btn.appendChild(badge);
+
+          const tip = document.createElement('span');
+          tip.className = 'error-tooltip';
+          const parts = entries.map(e => {
+            const cl = colorMap[e.color] || '#ef4444';
+            return '<span style="color:' + cl + '">' + (e.roleId || '?') + ' (' + (COLOR_LABELS[e.color] || '?') + ')</span>';
+          });
+          tip.innerHTML = '錯誤標記：' + parts.join('<span style="color:#888">、</span>');
+          tip.style.borderColor = colors[0];
+          btn.appendChild(tip);
+        }
+
+        if (!state.myColor) {
+          btn.classList.add('locked');
+        }
+
+        btn.addEventListener('click', () => handleCellClick(r, c));
+        btn.addEventListener('contextmenu', (e) => {
+          e.preventDefault();
+          handleErrorMark(r, c);
+        });
+        rowDiv.appendChild(btn);
+      }
+
+      gridBody.appendChild(rowDiv);
+    }
+  }
+
+  function handleCellClick(row, col) {
+    if (!state.myColor) {
+      showToast('請先選擇代表顏色/房號！ (Select a color first)', 'error');
+      return;
+    }
+
+    const currentColor = state.grid[row][col];
+
+    if (currentColor === state.myColor) {
+      let topMarked = -1;
+      for (let r = 0; r < GRID_ROWS; r++) {
+        if (state.grid[r].includes(state.myColor)) {
+          topMarked = r;
+          break;
+        }
+      }
+      if (row !== topMarked) {
+        showToast('只能從最上層開始逐一取消標記！', 'error');
+        return;
+      }
+      pushMutation('clear_door', { row, col });
+    } else if (currentColor === null) {
+      if (row < GRID_ROWS - 1) {
+        const rowBelow = row + 1;
+        const hasMarkBelow = state.grid[rowBelow].some(c => c === state.myColor);
+        if (!hasMarkBelow) {
+          showToast('請先完成下方階梯的標記！ (Complete lower floors first)', 'error');
+          return;
+        }
+      }
+      pushMutation('update_door', { row, col, color: state.myColor });
+    }
+  }
+
+  function handleErrorMark(row, col) {
+    if (!state.myRoleId) {
+      showToast('請先登入角色 ID 後才能標記錯誤！', 'error');
+      return;
+    }
+
+    if (row < GRID_ROWS - 1) {
+      const rowBelow = row + 1;
+      const hasMarkBelow = state.grid[rowBelow].some(c => c === state.myColor);
+      if (!hasMarkBelow) {
+        showToast('請先完成下方階梯後才能標記錯誤！', 'error');
+        return;
+      }
+    }
+
+    const hasCorrectInRow = state.grid[row].some(c => c === state.myColor);
+    if (hasCorrectInRow && !state.errors[row + ',' + col]?.[state.myId]) {
+      showToast('該層已有正確答案，無法再標記錯誤！', 'error');
+      return;
+    }
+
+    const errKey = row + ',' + col;
+    if (!state.errors[errKey]) state.errors[errKey] = {};
+
+    if (state.errors[errKey][state.myId]) {
+      delete state.errors[errKey][state.myId];
+      if (Object.keys(state.errors[errKey]).length === 0) {
+        delete state.errors[errKey];
+      }
+    } else {
+      state.errors[errKey][state.myId] = { roleId: state.myRoleId, color: state.myColor };
+    }
+
+    syncToServer();
+    renderGrid();
+  }
+
+  function updatePathDisplay() {
+    if (!state.myColor) {
+      myPathInput.value = '';
+      myPathInput.placeholder = '尚未標記任何階梯...';
+      return;
+    }
+
+    const pathParts = [];
+    for (let r = GRID_ROWS - 1; r >= 0; r--) {
+      const colIndex = state.grid[r].indexOf(state.myColor);
+      if (colIndex !== -1) {
+        pathParts.push(String(colIndex + 1));
+      } else {
+        pathParts.push('-');
+      }
+    }
+
+    const display = [];
+    for (let i = 0; i < pathParts.length; i += 5) {
+      display.push(pathParts.slice(i, i + 5).join(''));
+    }
+    myPathInput.value = display.join(' ');
+  }
+
+  function renderRoleAssignments() {
+    const items = roleAssignments.querySelectorAll('.role-assign-item');
+    const colorOrder = ['orange', 'blue', 'pink', 'green'];
+    items.forEach((item, i) => {
+      const color = colorOrder[i];
+      const roleId = state.roles[color];
+      const idSpan = item.querySelector('.role-assign-id, .role-assign-empty');
+      if (roleId) {
+        idSpan.className = 'role-assign-id';
+        idSpan.textContent = roleId;
+      } else {
+        idSpan.className = 'role-assign-empty';
+        idSpan.textContent = '未分配';
+      }
+    });
+    updateMyRoleDisplay();
+  }
+
+  function updateMyRoleDisplay() {
+    if (!state.myColor) {
+      myRoleDisplay.classList.remove('visible');
+      return;
+    }
+    const roleId = state.roles[state.myColor];
+    if (roleId) {
+      myRoleDisplay.classList.add('visible');
+      myRoleText.textContent = '你選擇了 ' + COLOR_LABELS[state.myColor] + '，角色 ID：' + roleId;
+    } else {
+      myRoleDisplay.classList.remove('visible');
+    }
+  }
+
+  // ─── Event Handlers ───
+  $$('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.target;
+      $$('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      createForm.classList.toggle('active', target === 'create-form');
+      joinForm.classList.toggle('active', target === 'join-form');
+    });
+  });
+
+  createBtn.addEventListener('click', () => {
+    const pw = createPassword.value.trim();
+    if (!isValidPassword(pw)) {
+      showToast('密碼必須是 2-4 位數字！', 'error');
+      return;
+    }
+    createRoom(pw);
+  });
+
+  createPassword.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') createBtn.click();
+  });
+
+  joinBtn.addEventListener('click', () => {
+    const code = cleanRoomCode(joinCode.value.trim());
+    const pw = joinPassword.value.trim();
+    if (!isValidCode(code)) {
+      showToast('房號必須是 6 位數字！', 'error');
+      return;
+    }
+    if (!isValidPassword(pw)) {
+      showToast('密碼必須是 2-4 位數字！', 'error');
+      return;
+    }
+    joinRoom(code, pw);
+  });
+
+  joinPassword.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') joinBtn.click();
+  });
+
+  colorPicker.addEventListener('click', (e) => {
+    const option = e.target.closest('.color-option');
+    if (!option) return;
+    const color = option.dataset.color;
+
+    if (option.classList.contains('taken')) {
+      showToast('這個顏色已經被其他人選走了，請選擇其他顏色！', 'error');
+      return;
+    }
+
+    if (option.classList.contains('selected')) {
+      state.myColor = null;
+      pushMutation('release_color', { color });
+    } else {
+      if (state.myColor) {
+        pushMutation('release_color', { color: state.myColor });
+      }
+      state.myColor = color;
+      const success = pushMutation('update_color', { color });
+      if (!success) {
+        state.myColor = null;
+        return;
+      }
+    }
+
+    renderGrid();
+    updatePathDisplay();
+    updateFooterInfo();
+    updateMyRoleDisplay();
+  });
+
+  roleConfirmBtn.addEventListener('click', () => {
+    const roleId = roleInput.value.trim();
+    if (!roleId) {
+      showToast('請輸入角色 ID！', 'error');
+      return;
+    }
+    if (!state.myColor) {
+      showToast('請先選擇代表顏色/房號！', 'error');
+      return;
+    }
+
+    state.myRoleId = roleId;
+    state.roles[state.myColor] = roleId;
+    localStorage.setItem('artale_roleId', roleId);
+    syncToServer();
+
+    renderRoleAssignments();
+    showToast('角色「' + roleId + '」已登入為 ' + COLOR_LABELS[state.myColor] + '！', 'success');
+  });
+
+  roleInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') roleConfirmBtn.click();
+  });
+
+  // Chat
+  function addSystemMsg(text) {
+    state.messages.push({ type: 'system', text, time: Date.now() });
+    if (state.messages.length > 50) state.messages.shift();
+    syncToServer();
+    renderChat();
+  }
+
+  function sendChatMessage() {
+    const text = chatInput.value.trim();
+    if (!text) return;
+    if (!state.myRoleId) {
+      showToast('請先登入角色 ID 後才能發送訊息！', 'error');
+      return;
+    }
+    state.messages.push({
+      type: 'chat',
+      roleId: state.myRoleId,
+      color: state.myColor,
+      text,
+      time: Date.now()
+    });
+    if (state.messages.length > 50) state.messages.shift();
+    chatInput.value = '';
+    syncToServer();
+    renderChat();
+  }
+
+  function renderChat() {
+    chatMessages.innerHTML = '';
+    const colorMap = { orange: '#ff9800', blue: '#2196f3', pink: '#e91e63', green: '#4caf50' };
+    state.messages.forEach(msg => {
+      const div = document.createElement('div');
+      div.className = 'chat-msg';
+      if (msg.type === 'system') {
+        div.classList.add('system');
+        div.textContent = msg.text;
+      } else {
+        const c = colorMap[msg.color] || '#ccc';
+        div.innerHTML = '<span class="name" style="color:' + c + '">' + msg.roleId + ':</span> ' + msg.text;
+      }
+      chatMessages.appendChild(div);
+    });
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  chatSendBtn.addEventListener('click', sendChatMessage);
+  chatInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') sendChatMessage();
+  });
+
+  $('#copy-btn').addEventListener('click', () => {
+    const info = 'Code: ' + formatRoomCode(state.roomCode) + '\nPassword: ' + state.password + '\nLink: ' + window.location.origin + window.location.pathname + '#/' + state.roomCode + '/' + state.password;
+    navigator.clipboard.writeText(info).then(() => {
+      showToast('已複製房間資訊 (Copied)', 'success');
+    }).catch(() => {
+      showToast('複製失敗！請手動複製', 'error');
+    });
+  });
+
+  $('#copy-path-btn').addEventListener('click', () => {
+    const path = myPathInput.value.trim();
+    if (!path) {
+      showToast('尚無路線可複製！', 'error');
+      return;
+    }
+    navigator.clipboard.writeText(path).then(() => {
+      showToast('路線已複製到剪貼簿！', 'success');
+    }).catch(() => {
+      showToast('複製失敗！請手動複製', 'error');
+    });
+  });
+
+  $('#clear-all-btn').addEventListener('click', () => {
+    if (!confirm('確定要重新開始嗎？這將會清除你所有的跳台標記。')) return;
+    pushMutation('clear_all_grid', {});
+    showToast('已重新開始', 'success');
+  });
+
+  $('#home-btn').addEventListener('click', () => {
+    leaveRoom();
+  });
+
+  $('#help-btn').addEventListener('click', () => {
+    helpModal.classList.remove('hidden');
+  });
+  $('#help-close').addEventListener('click', () => {
+    helpModal.classList.add('hidden');
+  });
+  helpModal.addEventListener('click', (e) => {
+    if (e.target === helpModal) helpModal.classList.add('hidden');
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      helpModal.classList.add('hidden');
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('tab-btn')) {
+      const target = e.target.dataset.target;
+      if (target === 'create-form') {
+        setTimeout(() => createPassword.focus(), 100);
+      } else if (target === 'join-form') {
+        setTimeout(() => joinCode.focus(), 100);
+      }
+    }
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (state.screen !== 'room') return;
+    if (!document.hidden) {
+      syncToServer();
+    }
+  });
+
+  window.addEventListener('beforeunload', () => {
+    leaveRoomOnDB();
+    unsubscribeRoom();
+  });
+
+  const savedRoleId = localStorage.getItem('artale_roleId');
+  if (savedRoleId) roleInput.value = savedRoleId;
+  showScreen('home');
+})();
+</script>
+</body>
+</html>
