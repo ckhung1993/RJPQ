@@ -2367,60 +2367,50 @@ body::before {
     }
 
     if (option.classList.contains('selected')) {
+      // Deselect: release color and its role assignment
       state.myColor = null;
+      state.roles[color] = null;
       pushMutation('release_color', { color });
     } else {
+      // Prevent duplicate role ID: if myRoleId is already assigned to another color by someone else
+      if (state.myRoleId && state.roles[color] && state.roles[color] !== state.myRoleId) {
+        showToast('這個顏色已被其他角色佔用，請選擇其他顏色！', 'error');
+        return;
+      }
       if (state.myColor) {
+        // Switching from old color: release old color + clear old role assignment
+        state.roles[state.myColor] = null;
         pushMutation('release_color', { color: state.myColor });
       }
       state.myColor = color;
+      // Assign role ID to this color
+      if (state.myRoleId) {
+        state.roles[color] = state.myRoleId;
+      }
       const success = pushMutation('update_color', { color });
       if (!success) {
         state.myColor = null;
         return;
       }
+      syncToServer();
     }
 
     renderGrid();
+    renderRoleAssignments();
     updatePathDisplay();
     updateFooterInfo();
     updateMyRoleDisplay();
   });
 
-  // Auto-login: restore previously saved role ID
+  // Auto-login: restore previously saved role ID (only sets myRoleId, color assignment happens when user picks a color)
   async function autoLoginRole() {
     const savedRoleId = localStorage.getItem('artale_roleId');
     if (!savedRoleId) return;
-    if (state.myRoleId) return; // already logged in
+    if (state.myRoleId) return;
 
-    // Check if saved role ID already owns a color slot in this room
-    for (let color in state.roles) {
-      if (state.roles[color] && state.roles[color].roleId === savedRoleId) {
-        state.myRoleId = savedRoleId;
-        state.myColor = color;
-        localStorage.setItem('artale_assignedColor', color);
-        await loadStateToDB();
-        renderGrid();
-        updateRolePanel();
-        addSystemMsg(`自動登入：${getRoleEmoji(color)} ${getRoleName(color)}（${savedRoleId}）`);
-        return;
-      }
-    }
-
-    // Try to take an available color slot for our saved ID
-    for (let color in state.roles) {
-      if (!state.roles[color]) {
-        state.roles[color] = { roleId: savedRoleId };
-        state.myRoleId = savedRoleId;
-        state.myColor = color;
-        localStorage.setItem('artale_assignedColor', color);
-        await loadStateToDB();
-        renderGrid();
-        updateRolePanel();
-        addSystemMsg(`自動登入：${getRoleEmoji(color)} ${getRoleName(color)}（${savedRoleId}）`);
-        return;
-      }
-    }
+    state.myRoleId = savedRoleId;
+    roleInput.value = savedRoleId;
+    addSystemMsg(`自動登入角色 ID：${savedRoleId}，請選擇顏色房號即可開始`);
   }
 
   roleConfirmBtn.addEventListener('click', () => {
@@ -2432,6 +2422,14 @@ body::before {
     if (!state.myColor) {
       showToast('請先選擇代表顏色/房號！', 'error');
       return;
+    }
+
+    // Prevent duplicate: check if this roleId is already used by another color
+    for (let c in state.roles) {
+      if (c !== state.myColor && state.roles[c] === roleId) {
+        showToast(`角色 ID「${roleId}」已被 ${COLOR_LABELS[c]} 使用，請更換 ID！`, 'error');
+        return;
+      }
     }
 
     state.myRoleId = roleId;
