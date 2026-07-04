@@ -568,15 +568,18 @@ body::before {
 .lobby-title {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 1.05rem;
+  gap: 10px;
+  font-size: 1.2rem;
   font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: 14px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+  letter-spacing: 0.02em;
 }
 
 .lobby-title i {
-  font-size: 20px;
+  font-size: 22px;
   color: var(--primary);
 }
 
@@ -1888,6 +1891,9 @@ body::before {
 
     <!-- Team Finder Section -->
     <div class="glass-card">
+      <div class="lobby-title" id="lobby-title">
+        <i class="ph ph-users-three"></i> 組隊大廳
+      </div>
       <div class="team-finder-section">
         <div class="section-divider"></div>
         <div class="section-header">
@@ -1946,9 +1952,6 @@ body::before {
 
         <!-- Team Lobby -->
         <div class="team-lobby" id="team-lobby">
-          <div class="lobby-title" id="lobby-title">
-            <i class="ph ph-users-three"></i> 組隊大廳
-          </div>
           <div class="lobby-empty" id="lobby-empty">
             <i class="ph ph-clipboard-text"></i>
             <p>暫無組隊信息，快來發布第一條吧！</p>
@@ -3197,6 +3200,7 @@ body::before {
       channel: channelVal,
       maxPlayers: maxPlayers,
       publisherId: publisherId,
+      publisherUid: state.myId,
       joinedPlayers: [],
       time: new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }),
       timestamp: Date.now()
@@ -3222,7 +3226,6 @@ body::before {
       lobbyEmpty.style.display = 'block';
       lobbyList.style.display = 'none';
       lobbyFilter.style.display = 'none';
-      lobbyTitle.style.display = 'none';
       return;
     }
 
@@ -3234,7 +3237,6 @@ body::before {
     lobbyEmpty.style.display = 'none';
     lobbyFilter.style.display = 'flex';
     lobbyList.style.display = 'flex';
-    lobbyTitle.style.display = 'flex';
 
     // 渲染篩選按鈕 active 狀態
     lobbyFilter.querySelectorAll('.filter-chip').forEach(chip => {
@@ -3251,7 +3253,7 @@ body::before {
       const joinedCount = (item.joinedPlayers || []).length;
       const remaining = item.maxPlayers - joinedCount;
       const isFull = remaining <= 0;
-      const isOwn = state.myRoleId && state.myRoleId === item.publisherId;
+      const isOwn = state.myId === item.publisherUid;
 
       // B: 快過期標記
       const timeLeft = EXPIRY - (now - item.timestamp);
@@ -3292,8 +3294,8 @@ body::before {
         const listingId = parseInt(this.dataset.id);
         const listing = teamListings.find(item => item.id === listingId);
         if (!listing) return;
-        const myId = state.myRoleId || '未知玩家';
-        if (myId === listing.publisherId) return;
+        if (state.myId === listing.publisherUid) return;
+        const myId = state.myRoleId || state.myId;
         if (!listing.joinedPlayers) listing.joinedPlayers = [];
         if (listing.joinedPlayers.includes(myId)) {
           alert('你已經參加了這個隊伍！');
