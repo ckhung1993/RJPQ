@@ -3537,7 +3537,6 @@ body::before {
   const channelInput = document.getElementById('channel-input');
   const lobbyEmpty = document.getElementById('lobby-empty');
   const lobbyList = document.getElementById('lobby-list');
-  const MAX_PLAYERS = 4;
   const lobbyFilter = document.getElementById('lobby-filter');
   const lobbyTitle = document.getElementById('lobby-title');
   let currentFilter = 'all';
@@ -3660,13 +3659,14 @@ body::before {
     if (roles.length === 0) { alert('請至少選擇一個已有隊員！'); return; }
     if (!channelVal || parseInt(channelVal) < 1) { alert('請輸入有效的頻道號碼（正整數）！'); return; }
 
+    const totalTeamSize = roles.reduce((sum, r) => sum + (r.count || 1), 0);
     const id = Date.now() * 1000 + Math.floor(Math.random() * 1000);
     const insertPayload = {
       id: id,
       dungeon: dungeonVal,
       roles: roles,
       channel: channelVal,
-      max_players: MAX_PLAYERS,
+      max_players: totalTeamSize,
       publisher_id: publisherId,
       publisher_uid: state.myId,
       joined_players: [state.myId],
@@ -3801,8 +3801,6 @@ body::before {
         joinBtnHTML = '<button class="depart-team-btn" data-id="' + item.id + '"><i class="ph ph-rocket-launch"></i> 出發</button>';
       } else if (isOwn && isDeparted) {
         joinBtnHTML = '<span class="team-publisher">我的發布</span>';
-      } else if (isOwn && !isDeparted) {
-        joinBtnHTML = '<span class="team-publisher">等待隊員加入...</span>';
       } else if (isFull || isDeparted) {
         joinBtnHTML = '<button class="join-team-btn" data-id="' + item.id + '" disabled><i class="ph ph-handshake"></i> ' + (isDeparted ? '已出戰' : '已滿') + '</button>';
       } else {
