@@ -507,6 +507,21 @@ body::before {
   cursor: pointer;
 }
 
+.role-recommend {
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: rgba(99,102,241,0.1);
+  border: 1px solid rgba(99,102,241,0.25);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.role-recommend strong {
+  color: var(--primary);
+}
+
 /* Form Actions */
 .form-actions {
   display: flex;
@@ -2215,7 +2230,7 @@ body::before {
           </div>
 
           <div class="input-group">
-            <label class="input-label">空缺隊員</label>
+            <label class="input-label">已有隊員</label>
             <div class="checkbox-group" id="role-group">
               <label class="checkbox-chip"><input type="checkbox" value="打手"> 打手</label>
               <input type="number" class="role-count-input" value="1" min="1" max="6" data-role="打手" style="width:48px;height:32px;text-align:center;font-size:14px;background:rgba(255,255,255,0.05);border:1.5px solid var(--border);border-radius:var(--radius-xs);color:var(--text-primary);outline:none;margin-left:4px;">
@@ -2225,6 +2240,7 @@ body::before {
               <input type="number" class="role-count-input" value="1" min="1" max="6" data-role="盜賊" style="width:48px;height:32px;text-align:center;font-size:14px;background:rgba(255,255,255,0.05);border:1.5px solid var(--border);border-radius:var(--radius-xs);color:var(--text-primary);outline:none;margin-left:4px;">
             </div>
           </div>
+          <div class="role-recommend" id="role-recommend" style="display:none;"></div>
 
           <div class="input-group">
             <label class="input-label">頻道</label>
@@ -3537,10 +3553,75 @@ body::before {
   cancelTeamBtn.addEventListener('click', () => {
     teamFormEl.style.display = 'none';
     toggleTeamFormBtn.innerHTML = '<i class="ph ph-plus-circle"></i> 發布組隊信息';
+    roleRecommendEl.style.display = 'none';
   });
 
   channelInput.addEventListener('input', () => {
     channelInput.value = channelInput.value.replace(/[^0-9]/g, '');
+  });
+
+  // 智能推薦角色計算
+  const STANDARD_CONFIG = { '打手': 2, '法師': 1, '盜賊': 1 };
+  const roleRecommendEl = document.getElementById('role-recommend');
+
+  function getSelectedRoles() {
+    const checks = document.querySelectorAll('#role-group input[type="checkbox"]:checked');
+    const result = {};
+    checks.forEach(cb => {
+      const inp = document.querySelector('.role-count-input[data-role="' + cb.value + '"]');
+      result[cb.value] = inp ? Math.min(Math.max(parseInt(inp.value) || 1, 1), 6) : 1;
+    });
+    return result;
+  }
+
+  function updateRoleRecommend() {
+    const selected = getSelectedRoles();
+    const publisherClass = playerProfile ? playerProfile.class : null;
+
+    // 已知發布者職業：用標準配置減去(發布者 + 已有隊員)
+    // 未知發布者職業：標準配置減去已有隊員 = 發布者 + 推薦空缺
+    const needed = {};
+    for (const [role, stdCount] of Object.entries(STANDARD_CONFIG)) {
+      const have = (publisherClass === role ? 1 : 0) + (selected[role] || 0);
+      needed[role] = Math.max(0, stdCount - have);
+    }
+
+    const totalNeeded = Object.values(needed).reduce((a, b) => a + b, 0);
+    if (totalNeeded === 0) {
+      roleRecommendEl.style.display = 'block';
+      roleRecommendEl.innerHTML = '<i class="ph ph-check-circle" style="color:#22c55e;"></i> 隊伍配置完整！2打手 + 1法師 + 1盜賊';
+      return;
+    }
+
+    if (Object.keys(selected).length === 0) {
+      roleRecommendEl.style.display = 'none';
+      return;
+    }
+
+    const missing = Object.entries(needed).filter(([, n]) => n > 0);
+    const missingParts = missing.map(([r, n]) => (n > 1 ? r + ' x' + n : r)).join('、');
+    let publisherHint = '';
+    if (!publisherClass && totalNeeded === 1) {
+      const [singleRole] = missing[0];
+      publisherHint = '<br>推測你的職業為 <strong>' + singleRole + '</strong>';
+    } else if (!publisherClass && totalNeeded > 1) {
+      publisherHint = '<br>尚未確定你的職業，請在上方角色登入面板設定';
+    }
+
+    roleRecommendEl.style.display = 'block';
+    if (publisherClass) {
+      roleRecommendEl.innerHTML = '你的職業: <strong>' + publisherClass + '</strong>&emsp;仍需組員: <strong>' + missingParts + '</strong>';
+    } else {
+      roleRecommendEl.innerHTML = '仍需組員: <strong>' + missingParts + '</strong>' + publisherHint;
+    }
+  }
+
+  // 監聽角色變更
+  document.querySelectorAll('#role-group input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener('change', updateRoleRecommend);
+  });
+  document.querySelectorAll('.role-count-input').forEach(inp => {
+    inp.addEventListener('input', updateRoleRecommend);
   });
 
   submitTeamBtn.addEventListener('click', async () => {
@@ -3552,12 +3633,31 @@ body::before {
       const count = countInput ? Math.min(Math.max(parseInt(countInput.value) || 1, 1), 6) : 1;
       return { role: cb.value, count: count };
     });
+
+    // 推斷發布者職業並加入角色列表
+    const publisherClass = playerProfile ? playerProfile.class : null;
+    let pubRole = publisherClass;
+    if (!pubRole) {
+      // 從標準配置推算：標準減去已有隊員，剩下唯一的就是發布者
+      const selMap = {};
+      roles.forEach(r => { selMap[r.role] = (selMap[r.role] || 0) + r.count; });
+      const missing = Object.entries({ '打手': 2, '法師': 1, '盜賊': 1 })
+        .filter(([r, std]) => (selMap[r] || 0) < std)
+        .map(([r, std]) => ({ role: r, need: std - (selMap[r] || 0) }));
+      if (missing.length === 1 && missing[0].need === 1) pubRole = missing[0].role;
+    }
+    if (pubRole) {
+      const existing = roles.find(r => r.role === pubRole);
+      if (existing) existing.count += 1;
+      else roles.push({ role: pubRole, count: 1 });
+    }
+
     const channelVal = channelInput.value.trim();
     const publisherId = playerProfile
       ? playerProfile.roleId + (playerProfile.level ? ' Lv.' + playerProfile.level : '') + (playerProfile.class ? ' ' + playerProfile.class : '')
       : (state.myRoleId || '未知玩家');
 
-    if (roles.length === 0) { alert('請至少選擇一個空缺隊員！'); return; }
+    if (roles.length === 0) { alert('請至少選擇一個已有隊員！'); return; }
     if (!channelVal || parseInt(channelVal) < 1) { alert('請輸入有效的頻道號碼（正整數）！'); return; }
 
     const id = Date.now() * 1000 + Math.floor(Math.random() * 1000);
@@ -3601,6 +3701,7 @@ body::before {
     document.querySelector('input[name="dungeon"][value="羅密歐"]').checked = true;
     document.querySelectorAll('#role-group input[type="checkbox"]:checked').forEach(cb => cb.checked = false);
     document.querySelectorAll('.role-count-input').forEach(inp => inp.value = '1');
+    roleRecommendEl.style.display = 'none';
     channelInput.value = '';
     teamFormEl.style.display = 'none';
     toggleTeamFormBtn.innerHTML = '<i class="ph ph-plus-circle"></i> 發布組隊信息';
@@ -3696,10 +3797,12 @@ body::before {
       let joinBtnHTML;
       const isDeparted = item.status === 'departed';
 
-      if (isOwn && !isDeparted) {
+      if (isOwn && !isDeparted && isFull) {
         joinBtnHTML = '<button class="depart-team-btn" data-id="' + item.id + '"><i class="ph ph-rocket-launch"></i> 出發</button>';
       } else if (isOwn && isDeparted) {
         joinBtnHTML = '<span class="team-publisher">我的發布</span>';
+      } else if (isOwn && !isDeparted) {
+        joinBtnHTML = '<span class="team-publisher">等待隊員加入...</span>';
       } else if (isFull || isDeparted) {
         joinBtnHTML = '<button class="join-team-btn" data-id="' + item.id + '" disabled><i class="ph ph-handshake"></i> ' + (isDeparted ? '已出戰' : '已滿') + '</button>';
       } else {
@@ -3714,7 +3817,7 @@ body::before {
         '<div class="tc-top">' +
         '<span class="team-dungeon ' + (item.dungeon === '羅密歐' ? 'dungeon-romeo' : 'dungeon-juliet') + '">' + item.dungeon + '</span>' +
         statusBadge +
-        (isOwn || isJoined ? '<span class="team-channel"><i class="ph ph-broadcast"></i> CH.' + item.channel + '</span>' : '<span class="team-channel locked"><i class="ph ph-lock"></i> 參加後查看</span>') +
+        (isOwn || isJoined ? '<span class="team-channel"><i class="ph ph-broadcast"></i> CH.' + item.channel + '</span>' : '<span class="team-channel locked"><i class="ph ph-lock"></i> 參加後查看頻道</span>') +
         '<span class="team-time">' + item.time + '</span>' +
         '</div>' +
         '<div class="tc-mid">' +
