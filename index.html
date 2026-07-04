@@ -106,13 +106,14 @@ body::before {
 }
 
 .home-right {
-  width: 440px;
+  width: 560px;
   flex-shrink: 0;
   margin-top: 40px;
 }
 
 .home-right .glass-card {
   margin-bottom: 0;
+  max-width: 100%;
 }
 
 .home-right .credit {
@@ -647,8 +648,8 @@ body::before {
 }
 
 .team-dungeon.dungeon-romeo {
-  background: rgba(59,130,246,0.15);
-  color: #60a5fa;
+  background: rgba(181,131,90,0.15);
+  color: #d4a76a;
 }
 .team-dungeon.dungeon-juliet {
   background: rgba(234,179,8,0.15);
@@ -682,6 +683,12 @@ body::before {
   padding: 4px 10px;
   border-radius: 6px;
   white-space: nowrap;
+}
+
+.team-channel.locked {
+  color: rgba(255,255,255,0.3);
+  font-weight: 400;
+  font-size: 11px;
 }
 
 .team-time {
@@ -883,6 +890,44 @@ body::before {
 }
 .filter-chip[data-filter="departed"].active::after {
   background: #a78bfa;
+}
+
+/* 角色篩選晶片 */
+.filter-chip[data-filter="打手"]:hover {
+  color: #f87171;
+  background: rgba(248,113,113,0.08);
+}
+.filter-chip[data-filter="打手"].active {
+  background: rgba(248,113,113,0.18);
+  color: #f87171;
+  box-shadow: 0 0 12px rgba(248,113,113,0.2);
+}
+.filter-chip[data-filter="打手"].active::after {
+  background: #f87171;
+}
+.filter-chip[data-filter="法師"]:hover {
+  color: #60a5fa;
+  background: rgba(96,165,250,0.08);
+}
+.filter-chip[data-filter="法師"].active {
+  background: rgba(96,165,250,0.18);
+  color: #60a5fa;
+  box-shadow: 0 0 12px rgba(96,165,250,0.2);
+}
+.filter-chip[data-filter="法師"].active::after {
+  background: #60a5fa;
+}
+.filter-chip[data-filter="盜賊"]:hover {
+  color: #c084fc;
+  background: rgba(192,132,252,0.08);
+}
+.filter-chip[data-filter="盜賊"].active {
+  background: rgba(192,132,252,0.18);
+  color: #c084fc;
+  box-shadow: 0 0 12px rgba(192,132,252,0.2);
+}
+.filter-chip[data-filter="盜賊"].active::after {
+  background: #c084fc;
 }
 
 /* 隊伍狀態標籤 */
@@ -2212,6 +2257,9 @@ body::before {
             <button class="filter-chip" data-filter="茱麗葉"><i class="ph ph-flower"></i> 茱麗葉</button>
             <button class="filter-chip" data-filter="recruiting"><i class="ph ph-hourglass-simple"></i> 等待組隊</button>
             <button class="filter-chip" data-filter="departed"><i class="ph ph-rocket-launch"></i> 已出戰</button>
+            <button class="filter-chip" data-filter="打手"><i class="ph ph-sword"></i> 打手</button>
+            <button class="filter-chip" data-filter="法師"><i class="ph ph-sparkle"></i> 法師</button>
+            <button class="filter-chip" data-filter="盜賊"><i class="ph ph-eye"></i> 盜賊</button>
           </div>
           <div class="lobby-list" id="lobby-list"></div>
         </div>
@@ -3521,7 +3569,7 @@ body::before {
       max_players: MAX_PLAYERS,
       publisher_id: publisherId,
       publisher_uid: state.myId,
-      joined_players: [],
+      joined_players: [state.myId],
       time: new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }),
       timestamp: Date.now()
     };
@@ -3592,6 +3640,15 @@ body::before {
       let items = data;
       if (currentFilter === 'recruiting') items = items.filter(item => !item.status || item.status === 'recruiting');
       else if (currentFilter === 'departed') items = items.filter(item => item.status === 'departed');
+      else if (currentFilter === '打手' || currentFilter === '法師' || currentFilter === '盜賊') {
+        items = items.filter(item => {
+          const roles = item.roles || [];
+          return roles.some(r => {
+            const roleObj = typeof r === 'object' ? r : (typeof r === 'string' && r.startsWith('{') ? JSON.parse(r) : { role: r });
+            return roleObj.role === currentFilter;
+          });
+        });
+      }
       else if (currentFilter !== 'all') items = items.filter(item => item.dungeon === currentFilter);
       return items;
     })();
@@ -3615,8 +3672,13 @@ body::before {
 
     lobbyList.innerHTML = filtered.map((item, i) => {
       const roleTags = item.roles.map(r => {
-        const roleName = typeof r === 'object' ? r.role : r;
-        const count = typeof r === 'object' ? r.count : 1;
+        // 兼容 JSON 字串格式
+        let roleObj = r;
+        if (typeof r === 'string' && r.startsWith('{')) {
+          try { roleObj = JSON.parse(r); } catch(e) {}
+        }
+        const roleName = typeof roleObj === 'object' ? roleObj.role : roleObj;
+        const count = typeof roleObj === 'object' ? (roleObj.count || 1) : 1;
         const cls = roleName === '打手' ? 'dps' : roleName === '法師' ? 'mage' : 'thief';
         const display = count > 1 ? roleName + ' x' + count : roleName;
         return '<span class="role-tag ' + cls + '">' + display + '</span>';
@@ -3626,6 +3688,7 @@ body::before {
       const remaining = item.max_players - joinedCount;
       const isFull = remaining <= 0;
       const isOwn = state.myId === item.publisher_uid;
+      const isJoined = (item.joined_players || []).includes(state.myId);
 
       const timeLeft = EXPIRY - (now - item.timestamp);
       const expiring = timeLeft < EXPIRING;
@@ -3651,7 +3714,7 @@ body::before {
         '<div class="tc-top">' +
         '<span class="team-dungeon ' + (item.dungeon === '羅密歐' ? 'dungeon-romeo' : 'dungeon-juliet') + '">' + item.dungeon + '</span>' +
         statusBadge +
-        '<span class="team-channel"><i class="ph ph-broadcast"></i> CH.' + item.channel + '</span>' +
+        (isOwn || isJoined ? '<span class="team-channel"><i class="ph ph-broadcast"></i> CH.' + item.channel + '</span>' : '<span class="team-channel locked"><i class="ph ph-lock"></i> 參加後查看</span>') +
         '<span class="team-time">' + item.time + '</span>' +
         '</div>' +
         '<div class="tc-mid">' +
@@ -3705,7 +3768,7 @@ body::before {
       const { data: listingData, error: fetchErr } = await supabase.from('team_listings').select('*').eq('id', listingId).single();
       if (fetchErr || !listingData) { console.log('join: listing not found', listingId); return; }
       if (state.myId === listingData.publisher_uid) { console.log('join: own listing, skip'); return; }
-      const myId = state.myRoleId || state.myId;
+      const myId = state.myId;
       const joinedPlayers = listingData.joined_players || [];
       if (joinedPlayers.includes(myId)) {
         alert('你已經參加了這個隊伍！');
