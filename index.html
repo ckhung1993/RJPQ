@@ -817,18 +817,18 @@ body::before {
 }
 
 .filter-chip[data-filter="茱麗葉"]:hover {
-  color: #fca5a5;
-  background: rgba(239,68,68,0.08);
+  color: #fde047;
+  background: rgba(234,179,8,0.08);
 }
 
 .filter-chip[data-filter="茱麗葉"].active {
-  background: rgba(239,68,68,0.18);
-  color: #fca5a5;
-  box-shadow: 0 0 12px rgba(239,68,68,0.2);
+  background: rgba(234,179,8,0.18);
+  color: #fde047;
+  box-shadow: 0 0 12px rgba(234,179,8,0.2);
 }
 
 .filter-chip[data-filter="茱麗葉"].active::after {
-  background: #f87171;
+  background: #facc15;
 }
 
 .highlight-card {
@@ -1936,8 +1936,11 @@ body::before {
             <label class="input-label">空缺隊員</label>
             <div class="checkbox-group" id="role-group">
               <label class="checkbox-chip"><input type="checkbox" value="打手"> 打手</label>
+              <input type="number" class="role-count-input" value="1" min="1" max="6" data-role="打手" style="width:48px;height:32px;text-align:center;font-size:14px;background:rgba(255,255,255,0.05);border:1.5px solid var(--border);border-radius:var(--radius-xs);color:var(--text-primary);outline:none;margin-left:4px;">
               <label class="checkbox-chip"><input type="checkbox" value="法師"> 法師</label>
+              <input type="number" class="role-count-input" value="1" min="1" max="6" data-role="法師" style="width:48px;height:32px;text-align:center;font-size:14px;background:rgba(255,255,255,0.05);border:1.5px solid var(--border);border-radius:var(--radius-xs);color:var(--text-primary);outline:none;margin-left:4px;">
               <label class="checkbox-chip"><input type="checkbox" value="盜賊"> 盜賊</label>
+              <input type="number" class="role-count-input" value="1" min="1" max="6" data-role="盜賊" style="width:48px;height:32px;text-align:center;font-size:14px;background:rgba(255,255,255,0.05);border:1.5px solid var(--border);border-radius:var(--radius-xs);color:var(--text-primary);outline:none;margin-left:4px;">
             </div>
           </div>
 
@@ -1946,15 +1949,6 @@ body::before {
             <div class="input-wrapper">
               <i class="ph ph-broadcast"></i>
               <input type="text" id="channel-input" placeholder="輸入頻道"
-                     inputmode="numeric" autocomplete="off">
-            </div>
-          </div>
-
-          <div class="input-group">
-            <label class="input-label">隊伍人數（包含自己）</label>
-            <div class="input-wrapper">
-              <i class="ph ph-users"></i>
-              <input type="text" id="max-players-input" placeholder="最多幾人（2-6）"
                      inputmode="numeric" autocomplete="off">
             </div>
           </div>
@@ -3168,7 +3162,7 @@ body::before {
   const channelInput = document.getElementById('channel-input');
   const lobbyEmpty = document.getElementById('lobby-empty');
   const lobbyList = document.getElementById('lobby-list');
-  const maxPlayersInput = document.getElementById('max-players-input');
+  const MAX_PLAYERS = 4;
   const lobbyFilter = document.getElementById('lobby-filter');
   const lobbyTitle = document.getElementById('lobby-title');
   let currentFilter = 'all';
@@ -3190,21 +3184,16 @@ body::before {
     channelInput.value = channelInput.value.replace(/[^0-9]/g, '');
   });
 
-  maxPlayersInput.addEventListener('input', () => {
-    let val = maxPlayersInput.value.replace(/[^0-9]/g, '');
-    if (val !== '' && parseInt(val) > 6) val = '6';
-    if (val !== '' && parseInt(val) < 2) val = '2';
-    maxPlayersInput.value = val;
-  });
-
   submitTeamBtn.addEventListener('click', async () => {
     const dungeon = document.querySelector('input[name="dungeon"]:checked');
     const dungeonVal = dungeon ? dungeon.value : '羅密歐';
     const roleChecks = document.querySelectorAll('#role-group input[type="checkbox"]:checked');
-    const roles = Array.from(roleChecks).map(cb => cb.value);
+    const roles = Array.from(roleChecks).map(cb => {
+      const countInput = document.querySelector('.role-count-input[data-role="' + cb.value + '"]');
+      const count = countInput ? Math.min(Math.max(parseInt(countInput.value) || 1, 1), 6) : 1;
+      return { role: cb.value, count: count };
+    });
     const channelVal = channelInput.value.trim();
-    const maxVal = maxPlayersInput.value.trim();
-    const maxPlayers = maxVal ? Math.min(Math.max(parseInt(maxVal), 2), 6) : 4;
     const publisherId = state.myRoleId || '未知玩家';
 
     if (roles.length === 0) { alert('請至少選擇一個空缺隊員！'); return; }
@@ -3216,7 +3205,7 @@ body::before {
       dungeon: dungeonVal,
       roles: roles,
       channel: channelVal,
-      max_players: maxPlayers,
+      max_players: MAX_PLAYERS,
       publisher_id: publisherId,
       publisher_uid: state.myId,
       joined_players: [],
@@ -3250,8 +3239,8 @@ body::before {
     await renderTeamLobby();
     document.querySelector('input[name="dungeon"][value="羅密歐"]').checked = true;
     document.querySelectorAll('#role-group input[type="checkbox"]:checked').forEach(cb => cb.checked = false);
+    document.querySelectorAll('.role-count-input').forEach(inp => inp.value = '1');
     channelInput.value = '';
-    maxPlayersInput.value = '';
     teamFormEl.style.display = 'none';
     toggleTeamFormBtn.innerHTML = '<i class="ph ph-plus-circle"></i> 發布組隊信息';
   });
@@ -3300,8 +3289,11 @@ body::before {
 
     lobbyList.innerHTML = filtered.map((item, i) => {
       const roleTags = item.roles.map(r => {
-        const cls = r === '打手' ? 'dps' : r === '法師' ? 'mage' : 'thief';
-        return '<span class="role-tag ' + cls + '">' + r + '</span>';
+        const roleName = typeof r === 'object' ? r.role : r;
+        const count = typeof r === 'object' ? r.count : 1;
+        const cls = roleName === '打手' ? 'dps' : roleName === '法師' ? 'mage' : 'thief';
+        const display = count > 1 ? roleName + ' x' + count : roleName;
+        return '<span class="role-tag ' + cls + '">' + display + '</span>';
       }).join('');
 
       const joinedCount = (item.joined_players || []).length;
@@ -3350,7 +3342,8 @@ body::before {
     })
     .subscribe();
 
-  // 組隊大廳事件委託（刪除 + 參加，只綁定一次）
+  // 初始載入隊伍列表
+  renderTeamLobby();
   lobbyList.addEventListener('click', async function(e) {
     const delBtn = e.target.closest('.delete-team-btn');
     if (delBtn) {

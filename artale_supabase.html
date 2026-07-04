@@ -1953,15 +1953,6 @@ body::before {
             </div>
           </div>
 
-          <div class="input-group">
-            <label class="input-label">隊伍人數（包含自己）</label>
-            <div class="input-wrapper">
-              <i class="ph ph-users"></i>
-              <input type="text" id="max-players-input" placeholder="最多幾人（2-6）"
-                     inputmode="numeric" autocomplete="off">
-            </div>
-          </div>
-
           <div class="form-actions">
             <button class="primary-btn submit-team-btn" id="submit-team-btn">
               <i class="ph ph-paper-plane-tilt"></i> 發布信息
@@ -3171,7 +3162,7 @@ body::before {
   const channelInput = document.getElementById('channel-input');
   const lobbyEmpty = document.getElementById('lobby-empty');
   const lobbyList = document.getElementById('lobby-list');
-  const maxPlayersInput = document.getElementById('max-players-input');
+  const MAX_PLAYERS = 4;
   const lobbyFilter = document.getElementById('lobby-filter');
   const lobbyTitle = document.getElementById('lobby-title');
   let currentFilter = 'all';
@@ -3193,13 +3184,6 @@ body::before {
     channelInput.value = channelInput.value.replace(/[^0-9]/g, '');
   });
 
-  maxPlayersInput.addEventListener('input', () => {
-    let val = maxPlayersInput.value.replace(/[^0-9]/g, '');
-    if (val !== '' && parseInt(val) > 6) val = '6';
-    if (val !== '' && parseInt(val) < 2) val = '2';
-    maxPlayersInput.value = val;
-  });
-
   submitTeamBtn.addEventListener('click', async () => {
     const dungeon = document.querySelector('input[name="dungeon"]:checked');
     const dungeonVal = dungeon ? dungeon.value : '羅密歐';
@@ -3210,8 +3194,6 @@ body::before {
       return { role: cb.value, count: count };
     });
     const channelVal = channelInput.value.trim();
-    const maxVal = maxPlayersInput.value.trim();
-    const maxPlayers = maxVal ? Math.min(Math.max(parseInt(maxVal), 2), 6) : 4;
     const publisherId = state.myRoleId || '未知玩家';
 
     if (roles.length === 0) { alert('請至少選擇一個空缺隊員！'); return; }
@@ -3223,7 +3205,7 @@ body::before {
       dungeon: dungeonVal,
       roles: roles,
       channel: channelVal,
-      max_players: maxPlayers,
+      max_players: MAX_PLAYERS,
       publisher_id: publisherId,
       publisher_uid: state.myId,
       joined_players: [],
@@ -3259,7 +3241,6 @@ body::before {
     document.querySelectorAll('#role-group input[type="checkbox"]:checked').forEach(cb => cb.checked = false);
     document.querySelectorAll('.role-count-input').forEach(inp => inp.value = '1');
     channelInput.value = '';
-    maxPlayersInput.value = '';
     teamFormEl.style.display = 'none';
     toggleTeamFormBtn.innerHTML = '<i class="ph ph-plus-circle"></i> 發布組隊信息';
   });
@@ -3361,7 +3342,8 @@ body::before {
     })
     .subscribe();
 
-  // 組隊大廳事件委託（刪除 + 參加，只綁定一次）
+  // 初始載入隊伍列表
+  renderTeamLobby();
   lobbyList.addEventListener('click', async function(e) {
     const delBtn = e.target.closest('.delete-team-btn');
     if (delBtn) {
