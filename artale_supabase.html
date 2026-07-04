@@ -703,6 +703,12 @@ body::before {
 .door-btn.marked.pink   { background: rgba(233,30,99,0.35); border-color: var(--color-pink); box-shadow: 0 0 8px rgba(233,30,99,0.3); }
 .door-btn.marked.green  { background: rgba(76,175,80,0.35); border-color: var(--color-green); box-shadow: 0 0 8px rgba(76,175,80,0.3); }
 
+/* Dim other players' marks when I have a color selected */
+.door-btn.marked.dimmed {
+  opacity: 0.25;
+  box-shadow: none;
+}
+
 /* Error marker on door buttons */
 .error-badge {
   position: absolute;
@@ -1948,6 +1954,9 @@ body::before {
     addSystemMsg('房間已建立');
     showToast('房間建立成功！', 'success');
     setConnected(true);
+
+    // Auto-login: restore saved role ID
+    autoLoginRole();
   }
 
   async function joinRoom(code, password) {
@@ -1991,6 +2000,9 @@ body::before {
     addSystemMsg('一名玩家加入了房間');
     showToast('成功加入房間！', 'success');
     setConnected(true);
+
+    // Auto-login: restore saved role ID
+    autoLoginRole();
   }
 
   async function leaveRoom() {
@@ -2008,6 +2020,7 @@ body::before {
     state.players = {};
     state.colors = { orange: null, blue: null, pink: null, green: null };
     state.grid = Array.from({ length: GRID_ROWS }, () => Array(GRID_COLS).fill(null));
+    localStorage.removeItem('artale_assignedColor');
   }
 
   // ─── Grid ───
@@ -2032,6 +2045,7 @@ body::before {
       const { color } = payload;
       if (state.colors[color] === state.myId) {
         state.colors[color] = null;
+        localStorage.removeItem('artale_assignedColor');
       }
       state.myColor = null;
     } else if (type === 'update_door') {
@@ -2121,6 +2135,9 @@ body::before {
 
         if (cellColor) {
           btn.classList.add('marked', cellColor);
+          if (state.myColor && cellColor !== state.myColor) {
+            btn.classList.add('dimmed');
+          }
         }
 
         const errKey = r + ',' + c;
@@ -2370,6 +2387,42 @@ body::before {
     updateMyRoleDisplay();
   });
 
+  // Auto-login: restore previously saved role ID
+  async function autoLoginRole() {
+    const savedRoleId = localStorage.getItem('artale_roleId');
+    if (!savedRoleId) return;
+    if (state.myRoleId) return; // already logged in
+
+    // Check if saved role ID already owns a color slot in this room
+    for (let color in state.roles) {
+      if (state.roles[color] && state.roles[color].roleId === savedRoleId) {
+        state.myRoleId = savedRoleId;
+        state.myColor = color;
+        localStorage.setItem('artale_assignedColor', color);
+        await loadStateToDB();
+        renderGrid();
+        updateRolePanel();
+        addSystemMsg(`自動登入：${getRoleEmoji(color)} ${getRoleName(color)}（${savedRoleId}）`);
+        return;
+      }
+    }
+
+    // Try to take an available color slot for our saved ID
+    for (let color in state.roles) {
+      if (!state.roles[color]) {
+        state.roles[color] = { roleId: savedRoleId };
+        state.myRoleId = savedRoleId;
+        state.myColor = color;
+        localStorage.setItem('artale_assignedColor', color);
+        await loadStateToDB();
+        renderGrid();
+        updateRolePanel();
+        addSystemMsg(`自動登入：${getRoleEmoji(color)} ${getRoleName(color)}（${savedRoleId}）`);
+        return;
+      }
+    }
+  }
+
   roleConfirmBtn.addEventListener('click', () => {
     const roleId = roleInput.value.trim();
     if (!roleId) {
@@ -2384,6 +2437,7 @@ body::before {
     state.myRoleId = roleId;
     state.roles[state.myColor] = roleId;
     localStorage.setItem('artale_roleId', roleId);
+    localStorage.setItem('artale_assignedColor', state.myColor);
     syncToServer();
 
     renderRoleAssignments();
