@@ -3211,7 +3211,7 @@ body::before {
     if (!channelVal || parseInt(channelVal) < 1) { alert('請輸入有效的頻道號碼（正整數）！'); return; }
 
     const id = Date.now() * 1000 + Math.floor(Math.random() * 1000);
-    const { error } = await supabase.from('team_listings').insert({
+    const insertPayload = {
       id: id,
       dungeon: dungeonVal,
       roles: roles,
@@ -3222,18 +3222,31 @@ body::before {
       joined_players: [],
       time: new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }),
       timestamp: Date.now()
-    });
+    };
+    console.log('[submit] insertPayload:', JSON.stringify(insertPayload));
 
-    if (error) {
-      if (error.message && error.message.includes('does not exist')) {
-        alert('資料表尚未建立，請先在 Supabase SQL Editor 執行建表 SQL。');
-      } else {
-        console.error('Insert team_listings error:', error);
-        alert('發布失敗，請再試一次。');
+    try {
+      const { data: inserted, error } = await supabase.from('team_listings').insert(insertPayload).select();
+      console.log('[submit] insert result - data:', inserted, 'error:', error);
+
+      if (error) {
+        console.error('[submit] Insert team_listings error:', JSON.stringify(error));
+        alert('發布失敗（' + (error.message || error.code || '未知錯誤') + '），請再試一次。');
+        return;
       }
+
+      if (!inserted || inserted.length === 0) {
+        console.error('[submit] Insert returned empty data, RLS may be blocking');
+        alert('發布失敗（寫入返回空，請檢查 RLS 權限），請再試一次。');
+        return;
+      }
+    } catch (e) {
+      console.error('[submit] Exception during insert:', e);
+      alert('發布時發生異常（' + e.message + '），請檢查瀏覽器控制台。');
       return;
     }
 
+    console.log('[submit] Insert OK, calling renderTeamLobby...');
     await renderTeamLobby();
     document.querySelector('input[name="dungeon"][value="羅密歐"]').checked = true;
     document.querySelectorAll('#role-group input[type="checkbox"]:checked').forEach(cb => cb.checked = false);
@@ -3248,14 +3261,18 @@ body::before {
     const EXPIRY = 30 * 60 * 1000;
     const EXPIRING = 5 * 60 * 1000;
 
+    console.log('[renderTeamLobby] fetching, now - EXPIRY:', new Date(now - EXPIRY).toISOString());
+
     const { data, error } = await supabase
       .from('team_listings')
       .select('*')
       .gte('timestamp', now - EXPIRY)
       .order('timestamp', { ascending: false });
 
+    console.log('[renderTeamLobby] result - count:', data ? data.length : 0, 'error:', error, 'sample:', data ? JSON.stringify(data[0]) : 'null');
+
     if (error) {
-      console.error('renderTeamLobby fetch error:', error);
+      console.error('[renderTeamLobby] fetch error:', JSON.stringify(error));
       lobbyEmpty.style.display = 'block';
       lobbyList.style.display = 'none';
       lobbyFilter.style.display = 'none';
