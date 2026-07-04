@@ -93,6 +93,33 @@ body::before {
   padding: 20px;
 }
 
+/* ── Home Layout: 雙欄 ── */
+.home-layout {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.home-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.home-right {
+  width: 380px;
+  flex-shrink: 0;
+}
+
+.home-right .glass-card {
+  margin-bottom: 0;
+}
+
+.home-right .credit {
+  margin-top: 12px;
+  opacity: 0.5;
+  font-size: 11px;
+}
+
 /* Characters */
 .characters-row {
   display: flex;
@@ -537,12 +564,30 @@ body::before {
   gap: 10px;
 }
 
+/* Lobby Title */
+.lobby-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 14px;
+}
+
+.lobby-title i {
+  font-size: 20px;
+  color: var(--primary);
+}
+
 /* Team Card */
 .team-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
   background: rgba(255,255,255,0.04);
   border: 1px solid var(--glass-border);
   border-radius: 10px;
@@ -639,6 +684,129 @@ body::before {
 .delete-team-btn:hover {
   color: #ef4444;
   background: rgba(239,68,68,0.1);
+}
+
+/* ── Join Team Button ── */
+.join-team-btn {
+  background: linear-gradient(135deg, rgba(34,197,94,0.2), rgba(16,185,129,0.2));
+  border: 1px solid rgba(34,197,94,0.35);
+  color: #4ade80;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 7px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+}
+
+.join-team-btn:hover {
+  background: linear-gradient(135deg, rgba(34,197,94,0.3), rgba(16,185,129,0.3));
+  border-color: #4ade80;
+  box-shadow: 0 0 14px rgba(34,197,94,0.25);
+  transform: translateY(-1px);
+}
+
+.join-team-btn:active {
+  transform: translateY(0);
+}
+
+.join-team-btn:disabled {
+  background: rgba(255,255,255,0.04);
+  border-color: var(--glass-border);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* ── Lobby Filter ── */
+.lobby-filter {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding: 6px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+}
+
+.filter-chip {
+  flex: 1;
+  padding: 7px 0;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  position: relative;
+}
+
+.filter-chip:hover {
+  color: var(--text-primary);
+  background: rgba(255,255,255,0.06);
+}
+
+.filter-chip.active {
+  background: rgba(99,102,241,0.2);
+  color: #a5b4fc;
+  box-shadow: 0 0 12px rgba(99,102,241,0.15);
+  font-weight: 700;
+}
+
+.filter-chip.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 2px;
+  background: var(--primary);
+  border-radius: 1px;
+}
+
+.filter-chip[data-filter="羅密歐"]:hover {
+  color: #93c5fd;
+  background: rgba(59,130,246,0.08);
+}
+
+.filter-chip[data-filter="羅密歐"].active {
+  background: rgba(59,130,246,0.18);
+  color: #93c5fd;
+  box-shadow: 0 0 12px rgba(59,130,246,0.2);
+}
+
+.filter-chip[data-filter="羅密歐"].active::after {
+  background: #60a5fa;
+}
+
+.filter-chip[data-filter="茱麗葉"]:hover {
+  color: #fca5a5;
+  background: rgba(239,68,68,0.08);
+}
+
+.filter-chip[data-filter="茱麗葉"].active {
+  background: rgba(239,68,68,0.18);
+  color: #fca5a5;
+  box-shadow: 0 0 12px rgba(239,68,68,0.2);
+}
+
+.filter-chip[data-filter="茱麗葉"].active::after {
+  background: #f87171;
 }
 
 .highlight-card {
@@ -1655,6 +1823,8 @@ body::before {
 
   <!-- HOME SCREEN -->
   <div id="home-screen" class="view-screen active">
+    <div class="home-layout">
+      <div class="home-left">
     <div class="characters-row">
       <img class="char-img left" src="data:image/png;base64,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" alt="茱麗葉">
       <img class="char-img right" src="data:image/png;base64,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" alt="羅密歐">
@@ -1713,6 +1883,8 @@ body::before {
       </div>
 
     </div>
+      </div>
+      <div class="home-right">
 
     <!-- Team Finder Section -->
     <div class="glass-card">
@@ -1753,6 +1925,15 @@ body::before {
             </div>
           </div>
 
+          <div class="input-group">
+            <label class="input-label">隊伍人數（包含自己）</label>
+            <div class="input-wrapper">
+              <i class="ph ph-users"></i>
+              <input type="text" id="max-players-input" placeholder="最多幾人（2-6）"
+                     inputmode="numeric" autocomplete="off">
+            </div>
+          </div>
+
           <div class="form-actions">
             <button class="primary-btn submit-team-btn" id="submit-team-btn">
               <i class="ph ph-paper-plane-tilt"></i> 發布信息
@@ -1765,14 +1946,17 @@ body::before {
 
         <!-- Team Lobby -->
         <div class="team-lobby" id="team-lobby">
+          <div class="lobby-title" id="lobby-title">
+            <i class="ph ph-users-three"></i> 組隊大廳
+          </div>
           <div class="lobby-empty" id="lobby-empty">
             <i class="ph ph-clipboard-text"></i>
             <p>暫無組隊信息，快來發布第一條吧！</p>
           </div>
           <div class="lobby-filter" id="lobby-filter" style="display:none;">
-            <button class="filter-chip active" data-filter="all">全部</button>
-            <button class="filter-chip romeo" data-filter="羅密歐">羅密歐</button>
-            <button class="filter-chip juliet" data-filter="茱麗葉">茱麗葉</button>
+            <button class="filter-chip active" data-filter="all"><i class="ph ph-list"></i> 全部</button>
+            <button class="filter-chip" data-filter="羅密歐"><i class="ph ph-crown"></i> 羅密歐</button>
+            <button class="filter-chip" data-filter="茱麗葉"><i class="ph ph-flower"></i> 茱麗葉</button>
           </div>
           <div class="lobby-list" id="lobby-list"></div>
         </div>
@@ -1781,6 +1965,8 @@ body::before {
       <div class="credit">
         <span>&copy; 2026 KaHung#MdvQYE All rights reserved.</span>
         <span>版本：v1.5.0</span>
+      </div>
+    </div>
       </div>
     </div>
   </div>
@@ -2964,6 +3150,7 @@ body::before {
   const lobbyList = document.getElementById('lobby-list');
   const maxPlayersInput = document.getElementById('max-players-input');
   const lobbyFilter = document.getElementById('lobby-filter');
+  const lobbyTitle = document.getElementById('lobby-title');
   let currentFilter = 'all';
 
   toggleTeamFormBtn.addEventListener('click', () => {
@@ -3035,6 +3222,7 @@ body::before {
       lobbyEmpty.style.display = 'block';
       lobbyList.style.display = 'none';
       lobbyFilter.style.display = 'none';
+      lobbyTitle.style.display = 'none';
       return;
     }
 
@@ -3046,6 +3234,7 @@ body::before {
     lobbyEmpty.style.display = 'none';
     lobbyFilter.style.display = 'flex';
     lobbyList.style.display = 'flex';
+    lobbyTitle.style.display = 'flex';
 
     // 渲染篩選按鈕 active 狀態
     lobbyFilter.querySelectorAll('.filter-chip').forEach(chip => {
@@ -3082,10 +3271,10 @@ body::before {
         '<div class="team-card-left"><span class="team-dungeon ' + (item.dungeon === '羅密歐' ? 'dungeon-romeo' : 'dungeon-juliet') + '">' + item.dungeon + '</span>' +
         '<span class="team-publisher">' + (item.publisherId || '未知玩家') + '</span>' +
         '<div class="team-roles">' + roleTags + '</div></div>' +
-        '<div class="team-card-right">' + joinBtnHTML +
+        '<div class="team-card-right">' +
         '<span class="team-channel"><i class="ph ph-broadcast"></i> CH.' + item.channel + '</span>' +
-        '<span class="team-time">' + item.time + '</span>' +
-        '<button class="delete-team-btn" data-id="' + item.id + '"><i class="ph ph-x-circle"></i></button></div></div>';
+        '<span class="team-time">' + item.time + '</span>' + joinBtnHTML +
+        (isOwn ? '<button class="delete-team-btn" data-id="' + item.id + '"><i class="ph ph-x-circle"></i></button>' : '') + '</div></div>';
     }).join('');
 
     lobbyList.querySelectorAll('.delete-team-btn').forEach(btn => {

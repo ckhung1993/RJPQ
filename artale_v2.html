@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>茱羅跳台協作工具 | MapleStory Romeo &amp; Juliet PQ Tool</title>
-<meta name="description" content="專為楓之谷 Artale 羅密歐與茱麗葉（羅朱）組隊任務打造的茱羅跳台協作工具，支援多人即時同步標記樓層。">
-<meta name="keywords" content="楓之谷, Artale, 羅密歐與茱麗葉, 羅朱, 跳台, 協作, 遊戲工具, 即時同步">
-<meta property="og:title" content="茱羅跳台協作工具 | MapleStory Romeo &amp; Juliet PQ Tool">
-<meta property="og:description" content="專為楓之谷 Artale 羅朱組隊任務打造的多人即時同步跳台協作工具。">
+<title>楓之谷 Artale 羅朱小工具 | 羅密歐與茱麗葉組隊任務</title>
+<meta name="description" content="專為楓之谷 Artale 羅密歐與茱麗葉（羅朱）組隊任務打造的小工具，支援多人即時同步標記樓層，就算手機鎖定螢幕也不斷線，讓你無痛通關！">
+<meta name="keywords" content="楓之谷, Artale, 羅密歐與茱麗葉, 羅朱, 羅朱小工具, 組隊任務, 小工具, 遊戲工具, 即時同步">
+<meta property="og:title" content="楓之谷 Artale 羅朱小工具 | 羅密歐與茱麗葉組隊任務">
+<meta property="og:description" content="專為楓之谷 Artale 羅朱組隊任務打造的多人即時同步樓層標記小工具。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -61,17 +61,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-body::before {
-  content: '';
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-image: radial-gradient(circle at 30% 20%, rgba(99, 102, 241, 0.06) 0%, transparent 50%),
-                    radial-gradient(circle at 70% 40%, rgba(129, 140, 248, 0.04) 0%, transparent 50%),
-                    radial-gradient(circle at 50% 80%, rgba(167, 139, 250, 0.05) 0%, transparent 50%);
-  pointer-events: none;
-  z-index: 0;
-}
-
 #noise-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -93,55 +82,6 @@ body::before {
   padding: 20px;
 }
 
-/* ── Home Layout: 雙欄 ── */
-.home-layout {
-  display: flex;
-  gap: 20px;
-  align-items: flex-start;
-}
-
-.home-left {
-  flex: 1;
-  min-width: 0;
-}
-
-.home-right {
-  width: 380px;
-  flex-shrink: 0;
-}
-
-.home-right .glass-card {
-  margin-bottom: 0;
-}
-
-.home-right .credit {
-  margin-top: 12px;
-  opacity: 0.5;
-  font-size: 11px;
-}
-
-/* Characters */
-.characters-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  width: 100%;
-  max-width: 420px;
-  margin-bottom: -24px;
-  padding: 0 24px;
-  position: relative;
-  z-index: 2;
-}
-
-.char-img {
-  height: 96px;
-  width: auto;
-  animation: fadeInUp 0.5s ease-out;
-}
-
-.char-img.left  { animation-delay: 0.10s; }
-.char-img.right { animation-delay: 0.25s; }
-
 /* Glass Card */
 .glass-card {
   background: var(--surface-card);
@@ -150,19 +90,10 @@ body::before {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 36px 32px;
-  box-shadow: var(--shadow), 0 0 60px rgba(99, 102, 241, 0.08);
+  box-shadow: var(--shadow);
   width: 100%;
   max-width: 420px;
   animation: fadeInUp 0.5s ease-out;
-  position: relative;
-}
-
-.glass-card::before {
-  content: '';
-  position: absolute;
-  top: -1px; left: 20px; right: 20px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.3), transparent);
 }
 
 @keyframes fadeInUp {
@@ -186,43 +117,23 @@ body::before {
 }
 
 .logo-icon {
-  font-size: 44px;
-  margin-bottom: 10px;
-  filter: drop-shadow(0 0 16px rgba(99, 102, 241, 0.6));
-  animation: iconFloat 3s ease-in-out infinite;
-}
-
-@keyframes iconFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+  font-size: 40px;
+  margin-bottom: 8px;
+  filter: drop-shadow(0 0 12px rgba(99, 102, 241, 0.5));
 }
 
 .logo h1 {
   font-size: 28px;
   font-weight: 800;
-  background: linear-gradient(135deg, #6366f1, #a78bfa, #e2e8f0, #818cf8);
-  background-size: 300% 300%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: gradientShift 4s ease infinite;
-  letter-spacing: 2px;
-  text-shadow: none;
-}
-
-@keyframes gradientShift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+  color: var(--text-primary);
+  letter-spacing: 0.5px;
 }
 
 .logo .subtitle {
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-top: 6px;
-  text-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  margin-top: 4px;
 }
 
 /* Tabs */
@@ -392,6 +303,16 @@ body::before {
   font-size: 16px;
 }
 
+.cat-trigger {
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: color 0.2s ease;
+}
+
+.cat-trigger:hover {
+  color: #f59e0b;
+}
+
 /* Credit */
 .credit {
   text-align: center;
@@ -403,419 +324,6 @@ body::before {
 
 .credit span {
   display: block;
-}
-
-/* ── Team Finder ── */
-.team-finder-section {
-  margin-top: 8px;
-}
-
-.section-divider {
-  height: 1px;
-  background: var(--glass-border);
-  margin: 16px 0;
-}
-
-.section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 14px;
-}
-
-.section-header h2 {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0;
-}
-
-.section-header h2 i {
-  font-size: 20px;
-  color: var(--primary);
-}
-
-.post-btn {
-  padding: 8px 16px;
-  font-size: 13px;
-}
-
-/* Team Post Form */
-.team-form {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid var(--glass-border);
-  border-radius: 12px;
-  padding: 18px 18px 14px;
-  margin-bottom: 16px;
-  animation: fadeIn 0.25s ease;
-}
-
-.input-label {
-  display: block;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  margin-bottom: 8px;
-}
-
-/* Radio Chips */
-.radio-group, .checkbox-group {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.radio-chip, .checkbox-chip {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  background: rgba(255,255,255,0.06);
-  border: 2px solid var(--glass-border);
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  user-select: none;
-}
-
-.radio-chip:hover, .checkbox-chip:hover {
-  border-color: var(--primary);
-  color: var(--text-primary);
-}
-
-.radio-chip:has(input:checked),
-.checkbox-chip:has(input:checked) {
-  background: rgba(99, 102, 241, 0.18);
-  border-color: var(--primary);
-  color: var(--primary);
-  font-weight: 600;
-}
-
-.radio-chip input, .checkbox-chip input {
-  accent-color: var(--primary);
-  width: 15px;
-  height: 15px;
-  cursor: pointer;
-}
-
-/* Form Actions */
-.form-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 8px;
-}
-
-.submit-team-btn {
-  flex: 1;
-}
-
-.secondary-btn {
-  padding: 10px 18px;
-  border: 1px solid var(--glass-border);
-  background: rgba(255,255,255,0.05);
-  color: var(--text-secondary);
-  font-family: var(--font);
-  font-size: 14px;
-  font-weight: 600;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-}
-
-.secondary-btn:hover {
-  color: var(--text-primary);
-  background: rgba(255,255,255,0.1);
-}
-
-/* Team Lobby */
-.team-lobby {
-  margin-top: 8px;
-}
-
-.lobby-empty {
-  text-align: center;
-  padding: 28px 16px;
-  color: var(--text-muted);
-}
-
-.lobby-empty i {
-  font-size: 36px;
-  opacity: 0.5;
-  display: block;
-  margin-bottom: 8px;
-}
-
-.lobby-empty p {
-  font-size: 13px;
-  margin: 0;
-}
-
-.lobby-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-/* Lobby Title */
-.lobby-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 14px;
-}
-
-.lobby-title i {
-  font-size: 20px;
-  color: var(--primary);
-}
-
-/* Team Card */
-.team-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  width: 100%;
-  box-sizing: border-box;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid var(--glass-border);
-  border-radius: 10px;
-  padding: 12px 16px;
-  transition: border-color 0.2s ease;
-}
-
-.team-card:hover {
-  border-color: var(--primary);
-}
-
-.team-card-left {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  flex: 1;
-  min-width: 0;
-}
-
-.team-dungeon {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--primary);
-  white-space: nowrap;
-  padding: 4px 10px;
-  background: rgba(99,102,241,0.12);
-  border-radius: 6px;
-}
-
-.team-dungeon.dungeon-romeo {
-  background: rgba(59,130,246,0.15);
-  color: #60a5fa;
-}
-.team-dungeon.dungeon-juliet {
-  background: rgba(239,68,68,0.15);
-  color: #f87171;
-}
-
-.team-roles {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.role-tag {
-  font-size: 12px;
-  font-weight: 600;
-  padding: 3px 10px;
-  border-radius: 14px;
-  background: rgba(245,158,11,0.15);
-  color: #f59e0b;
-}
-
-.role-tag.dps { background: rgba(239,68,68,0.15); color: #ef4444; }
-.role-tag.mage { background: rgba(59,130,246,0.15); color: #3b82f6; }
-.role-tag.thief { background: rgba(168,85,247,0.15); color: #a855f7; }
-
-.team-card-right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-shrink: 0;
-}
-
-.team-channel {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  background: rgba(255,255,255,0.06);
-  padding: 4px 10px;
-  border-radius: 6px;
-  white-space: nowrap;
-}
-
-.team-time {
-  font-size: 11px;
-  color: var(--text-muted);
-  white-space: nowrap;
-}
-
-.delete-team-btn {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  padding: 4px 6px;
-  border-radius: 6px;
-  font-size: 16px;
-  transition: all 0.15s ease;
-  display: flex;
-  align-items: center;
-}
-
-.delete-team-btn:hover {
-  color: #ef4444;
-  background: rgba(239,68,68,0.1);
-}
-
-/* ── Join Team Button ── */
-.join-team-btn {
-  background: linear-gradient(135deg, rgba(34,197,94,0.2), rgba(16,185,129,0.2));
-  border: 1px solid rgba(34,197,94,0.35);
-  color: #4ade80;
-  font-family: var(--font);
-  font-size: 12px;
-  font-weight: 700;
-  padding: 7px 14px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  white-space: nowrap;
-  letter-spacing: 0.3px;
-}
-
-.join-team-btn:hover {
-  background: linear-gradient(135deg, rgba(34,197,94,0.3), rgba(16,185,129,0.3));
-  border-color: #4ade80;
-  box-shadow: 0 0 14px rgba(34,197,94,0.25);
-  transform: translateY(-1px);
-}
-
-.join-team-btn:active {
-  transform: translateY(0);
-}
-
-.join-team-btn:disabled {
-  background: rgba(255,255,255,0.04);
-  border-color: var(--glass-border);
-  color: var(--text-muted);
-  cursor: not-allowed;
-  box-shadow: none;
-  transform: none;
-}
-
-/* ── Lobby Filter ── */
-.lobby-filter {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 14px;
-  padding: 6px;
-  background: rgba(255,255,255,0.03);
-  border-radius: 12px;
-  border: 1px solid var(--glass-border);
-}
-
-.filter-chip {
-  flex: 1;
-  padding: 7px 0;
-  border: none;
-  background: transparent;
-  color: var(--text-muted);
-  font-family: var(--font);
-  font-size: 12px;
-  font-weight: 600;
-  border-radius: 9px;
-  cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  position: relative;
-}
-
-.filter-chip:hover {
-  color: var(--text-primary);
-  background: rgba(255,255,255,0.06);
-}
-
-.filter-chip.active {
-  background: rgba(99,102,241,0.2);
-  color: #a5b4fc;
-  box-shadow: 0 0 12px rgba(99,102,241,0.15);
-  font-weight: 700;
-}
-
-.filter-chip.active::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 20px;
-  height: 2px;
-  background: var(--primary);
-  border-radius: 1px;
-}
-
-.filter-chip[data-filter="羅密歐"]:hover {
-  color: #93c5fd;
-  background: rgba(59,130,246,0.08);
-}
-
-.filter-chip[data-filter="羅密歐"].active {
-  background: rgba(59,130,246,0.18);
-  color: #93c5fd;
-  box-shadow: 0 0 12px rgba(59,130,246,0.2);
-}
-
-.filter-chip[data-filter="羅密歐"].active::after {
-  background: #60a5fa;
-}
-
-.filter-chip[data-filter="茱麗葉"]:hover {
-  color: #fca5a5;
-  background: rgba(239,68,68,0.08);
-}
-
-.filter-chip[data-filter="茱麗葉"].active {
-  background: rgba(239,68,68,0.18);
-  color: #fca5a5;
-  box-shadow: 0 0 12px rgba(239,68,68,0.2);
-}
-
-.filter-chip[data-filter="茱麗葉"].active::after {
-  background: #f87171;
-}
-
-.highlight-card {
-  animation: highlightPulse 0.6s ease;
-}
-
-@keyframes highlightPulse {
-  0% { border-color: var(--primary); box-shadow: 0 0 12px rgba(99,102,241,0.3); }
-  100% { border-color: var(--glass-border); box-shadow: none; }
 }
 
 /* Room Screen */
@@ -886,15 +394,6 @@ body::before {
 #display-room-code {
   color: var(--primary);
   font-weight: 800;
-}
-
-.online-count {
-  font-size: 0.78rem;
-  color: var(--success);
-  padding: 2px 10px;
-  background: rgba(34, 197, 94, 0.12);
-  border-radius: 12px;
-  white-space: nowrap;
 }
 
 .user-info {
@@ -1151,12 +650,6 @@ body::before {
 .door-btn.marked.blue   { background: rgba(33,150,243,0.35); border-color: var(--color-blue); box-shadow: 0 0 8px rgba(33,150,243,0.3); }
 .door-btn.marked.pink   { background: rgba(233,30,99,0.35); border-color: var(--color-pink); box-shadow: 0 0 8px rgba(233,30,99,0.3); }
 .door-btn.marked.green  { background: rgba(76,175,80,0.35); border-color: var(--color-green); box-shadow: 0 0 8px rgba(76,175,80,0.3); }
-
-/* Dim other players' marks when I have a color selected */
-.door-btn.marked.dimmed {
-  opacity: 0.25;
-  box-shadow: none;
-}
 
 /* Error marker on door buttons */
 .error-badge {
@@ -1541,6 +1034,33 @@ body::before {
   line-height: 1.5;
 }
 
+/* Cat Modal */
+.cat-img-container {
+  text-align: center;
+}
+
+.cat-img-placeholder {
+  width: 200px;
+  height: 200px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 80px;
+  margin: 0 auto 16px;
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.2);
+}
+
+.cat-bless {
+  font-size: 14px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
 /* Loading */
 .spinner {
   width: 36px;
@@ -1712,13 +1232,11 @@ body::before {
   }
 
   .logo h1 {
-    font-size: 22px;
-    letter-spacing: 1.5px;
+    font-size: 24px;
   }
 
   .logo .subtitle {
-    font-size: 10px;
-    letter-spacing: 2px;
+    font-size: 13px;
   }
 
   .room-label {
@@ -1823,17 +1341,11 @@ body::before {
 
   <!-- HOME SCREEN -->
   <div id="home-screen" class="view-screen active">
-    <div class="home-layout">
-      <div class="home-left">
-    <div class="characters-row">
-      <img class="char-img left" src="data:image/png;base64,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" alt="茱麗葉">
-      <img class="char-img right" src="data:image/png;base64,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" alt="羅密歐">
-    </div>
     <div class="glass-card">
       <div class="logo">
         <div class="logo-icon">✨</div>
-        <h1>茱羅跳台協作工具</h1>
-        <p class="subtitle">MapleStory Romeo &amp; Juliet PQ Tool</p>
+        <h1>組隊任務小工具</h1>
+        <p class="subtitle">羅密歐與茱麗葉</p>
       </div>
 
       <div class="tabs">
@@ -1880,93 +1392,14 @@ body::before {
         <a class="help-link" id="help-btn">
           <i class="ph ph-question"></i> 小工具使用說明
         </a>
-      </div>
-
-    </div>
-      </div>
-      <div class="home-right">
-
-    <!-- Team Finder Section -->
-    <div class="glass-card">
-      <div class="team-finder-section">
-        <div class="section-divider"></div>
-        <div class="section-header">
-          <h2><i class="ph ph-users-three"></i> 組隊尋找</h2>
-          <button class="primary-btn post-btn" id="toggle-team-form-btn">
-            <i class="ph ph-plus-circle"></i> 發布組隊信息
-          </button>
-        </div>
-
-        <!-- Post Form -->
-        <div class="team-form" id="team-form" style="display:none;">
-          <div class="input-group">
-            <label class="input-label">副本房間</label>
-            <div class="radio-group" id="dungeon-group">
-              <label class="radio-chip"><input type="radio" name="dungeon" value="羅密歐" checked> 羅密歐</label>
-              <label class="radio-chip"><input type="radio" name="dungeon" value="茱麗葉"> 茱麗葉</label>
-            </div>
-          </div>
-
-          <div class="input-group">
-            <label class="input-label">空缺隊員</label>
-            <div class="checkbox-group" id="role-group">
-              <label class="checkbox-chip"><input type="checkbox" value="打手"> 打手</label>
-              <label class="checkbox-chip"><input type="checkbox" value="法師"> 法師</label>
-              <label class="checkbox-chip"><input type="checkbox" value="盜賊"> 盜賊</label>
-            </div>
-          </div>
-
-          <div class="input-group">
-            <label class="input-label">頻道</label>
-            <div class="input-wrapper">
-              <i class="ph ph-broadcast"></i>
-              <input type="text" id="channel-input" placeholder="輸入頻道"
-                     inputmode="numeric" autocomplete="off">
-            </div>
-          </div>
-
-          <div class="input-group">
-            <label class="input-label">隊伍人數（包含自己）</label>
-            <div class="input-wrapper">
-              <i class="ph ph-users"></i>
-              <input type="text" id="max-players-input" placeholder="最多幾人（2-6）"
-                     inputmode="numeric" autocomplete="off">
-            </div>
-          </div>
-
-          <div class="form-actions">
-            <button class="primary-btn submit-team-btn" id="submit-team-btn">
-              <i class="ph ph-paper-plane-tilt"></i> 發布信息
-            </button>
-            <button class="secondary-btn cancel-btn" id="cancel-team-btn">
-              取消
-            </button>
-          </div>
-        </div>
-
-        <!-- Team Lobby -->
-        <div class="team-lobby" id="team-lobby">
-          <div class="lobby-title" id="lobby-title">
-            <i class="ph ph-users-three"></i> 組隊大廳
-          </div>
-          <div class="lobby-empty" id="lobby-empty">
-            <i class="ph ph-clipboard-text"></i>
-            <p>暫無組隊信息，快來發布第一條吧！</p>
-          </div>
-          <div class="lobby-filter" id="lobby-filter" style="display:none;">
-            <button class="filter-chip active" data-filter="all"><i class="ph ph-list"></i> 全部</button>
-            <button class="filter-chip" data-filter="羅密歐"><i class="ph ph-crown"></i> 羅密歐</button>
-            <button class="filter-chip" data-filter="茱麗葉"><i class="ph ph-flower"></i> 茱麗葉</button>
-          </div>
-          <div class="lobby-list" id="lobby-list"></div>
-        </div>
+        <span class="help-link cat-trigger" id="cat-btn">
+          <i class="ph ph-cat"></i> 要不要看幸運貓貓？
+        </span>
       </div>
 
       <div class="credit">
-        <span>&copy; 2026 KaHung#MdvQYE All rights reserved.</span>
-        <span>版本：v1.5.0</span>
-      </div>
-    </div>
+        <span>&copy; 2026 暗夜殺手萌萌#HwNqQ All rights reserved.</span>
+        <span>幸運貓貓 | 版本：v1.3.0 | 最後更新：2026-03-28 19:49</span>
       </div>
     </div>
   </div>
@@ -1978,7 +1411,6 @@ body::before {
         <div class="room-info">
           <div class="pulse-dot reconnecting" id="pulse-dot"></div>
           <span class="room-label">Room: <span id="display-room-code">------</span></span>
-          <span class="online-count" id="online-count">0 人在線</span>
           <div class="user-info">
             <span class="avatar">👤</span>
             <span id="my-name">連線中...</span>
@@ -2119,6 +1551,20 @@ body::before {
     </div>
   </div>
 </div>
+
+<!-- CAT MODAL -->
+<div id="cat-modal" class="overlay hidden">
+  <div class="modal-card">
+    <button class="modal-close" id="cat-close"><i class="ph ph-x"></i></button>
+    <div class="cat-img-container">
+      <div class="cat-img-placeholder">🐱</div>
+      <div class="cat-bless">
+        幸運貓貓幫您加持 <span>💖✨</span>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- LOADING OVERLAY -->
 <div id="loading" class="overlay hidden">
   <div class="modal-card" style="text-align:center; background: transparent; border: none; box-shadow: none;">
@@ -2130,16 +1576,9 @@ body::before {
 <!-- TOAST CONTAINER -->
 <div id="toast-container"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 (function() {
   'use strict';
-
-  // ⚠️ 請替換成你自己的 Supabase 專案 URL 和 anon key
-  // 到 https://supabase.com 建立專案後，在 Settings > API 頁面可以找到
-  const SUPABASE_URL = 'https://lpcpzrslspgxlyuodhng.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxwY3B6cnNsc3BneGx5dW9kaG5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxNzgxNzAsImV4cCI6MjA5ODc1NDE3MH0.BvGzqcR9Z5YAfokEZhEon8bt3spIefxiCTwHautbZjQ';
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   // ─── Constants ───
   const GRID_ROWS = 10;
@@ -2166,9 +1605,6 @@ body::before {
     lastActivity: Date.now()
   };
 
-  let channel = null;
-  let syncing = false;
-
   // ─── DOM Refs ───
   const $ = (s) => document.querySelector(s);
   const $$ = (s) => document.querySelectorAll(s);
@@ -2190,6 +1626,7 @@ body::before {
   const gridBody = $('#grid-body');
   const footerCopyText = $('#footer-copy-text');
   const helpModal = $('#help-modal');
+  const catModal = $('#cat-modal');
   const loadingOverlay = $('#loading');
   const loadingText = $('#loading-text');
   const toastContainer = $('#toast-container');
@@ -2201,101 +1638,75 @@ body::before {
   const chatMessages = $('#chat-messages');
   const chatInput = $('#chat-input');
   const chatSendBtn = $('#chat-send-btn');
-  const onlineCount = $('#online-count');
 
-  // ─── Supabase Real-time ───
-  function subscribeToRoom(roomCode) {
-    if (channel) {
-      supabase.removeChannel(channel);
-      channel = null;
+  // ─── HTTP real-time sync ───
+  const SERVER_URL = `${location.protocol}//${location.hostname}:3456`;
+  let pollTimer = null;
+  let serverTS = 0;
+
+  async function connectWS(roomCode, password, onReady) {
+    // Create room on server
+    if (state.isHost) {
+      try {
+        await fetch(`${SERVER_URL}/create`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ roomCode, password, state: getRoomState() })
+        });
+      } catch (e) {
+        showToast('無法連接伺服器，請確認伺服器已啟動', 'error');
+        return;
+      }
+    } else {
+      // Join room
+      try {
+        const res = await fetch(`${SERVER_URL}/join`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ roomCode, password, playerId: state.myId })
+        });
+        if (!res.ok) {
+          const err = await res.json();
+          showToast(err.error || '無法加入房間', 'error');
+          return;
+        }
+        const data = await res.json();
+        serverTS = data.ts;
+        if (data.state) applyServerState(data.state);
+      } catch (e) {
+        showToast('無法連接伺服器，請確認伺服器已啟動', 'error');
+        return;
+      }
     }
 
-    channel = supabase
-      .channel('room:' + roomCode)
-      .on(
-        'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'rooms', filter: 'room_code=eq.' + roomCode },
-        (payload) => {
-          if (payload.new && payload.new.state) {
-            applyRemoteState(payload.new.state);
-          }
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: 'DELETE', schema: 'public', table: 'rooms', filter: 'room_code=eq.' + roomCode },
-        () => {
-          handleRoomClosed();
-        }
-      )
-      .subscribe((status) => {
-        if (status === 'SUBSCRIBED') {
-          setConnected(true);
-        } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
-          setConnected(false);
-        }
-      });
+    pulseDot.classList.remove('reconnecting', 'disconnected');
+    startPolling(roomCode);
+
+    if (state.isHost) {
+      // For host, sync initial state
+      await apiSync();
+    }
+
+    if (onReady) onReady();
   }
 
-  function unsubscribeRoom() {
-    if (channel) {
-      supabase.removeChannel(channel);
-      channel = null;
-    }
+  function startPolling(roomCode) {
+    stopPolling();
+    pollTimer = setInterval(async () => {
+      try {
+        const res = await fetch(`${SERVER_URL}/state?room=${roomCode}&ts=${serverTS}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.ts > serverTS) {
+          serverTS = data.ts;
+          applyServerState(data.state);
+        }
+      } catch (e) {}
+    }, 800);
   }
 
-  async function createRoomOnDB(roomCode, password) {
-    const roomState = getRoomState();
-    const now = new Date().toISOString();
-    const { error } = await supabase.from('rooms').insert({
-      room_code: roomCode,
-      password: password,
-      state: roomState,
-      grid_activity: now,
-      updated_at: now
-    });
-
-    if (error) {
-      console.error('Create room error:', error);
-      showToast('建立房間失敗，請再試一次', 'error');
-      return false;
-    }
-    return true;
-  }
-
-  async function joinRoomOnDB(roomCode, password) {
-    const { data, error } = await supabase
-      .from('rooms')
-      .select('state')
-      .eq('room_code', roomCode)
-      .single();
-
-    if (error || !data) {
-      showToast('房間不存在或已關閉', 'error');
-      return false;
-    }
-
-    const srvState = data.state;
-    // Check password (stored in state for simplicity, or we can check db column)
-    // Actually password is separate column, let's do a separate check
-    const { data: roomData, error: roomError } = await supabase
-      .from('rooms')
-      .select('password')
-      .eq('room_code', roomCode)
-      .single();
-
-    if (roomError || !roomData) {
-      showToast('房間不存在', 'error');
-      return false;
-    }
-
-    if (roomData.password !== password) {
-      showToast('密碼錯誤！', 'error');
-      return false;
-    }
-
-    applyRemoteState(srvState);
-    return true;
+  function stopPolling() {
+    if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
   }
 
   function getRoomState() {
@@ -2310,78 +1721,26 @@ body::before {
   }
 
   async function syncToServer() {
-    if (syncing || !state.roomCode) return;
-    syncing = true;
-
     try {
-      const roomState = getRoomState();
-      const { error } = await supabase
-        .from('rooms')
-        .update({
-          state: roomState,
-          grid_activity: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        })
-        .eq('room_code', state.roomCode);
-
-      if (error) {
-        console.error('Sync error:', error);
-        if (error.code === 'PGRST116') {
-          // Row not found - room was deleted
-          handleRoomClosed();
-        }
+      const res = await fetch(`${SERVER_URL}/sync`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ roomCode: state.roomCode, state: getRoomState(), playerId: state.myId })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        serverTS = data.ts;
       }
-    } catch (e) {
-      console.error('Sync exception:', e);
-    }
-
-    syncing = false;
+    } catch (e) {}
   }
 
-  function updateOnlineCount() {
-    let count = 0;
-    for (const c of COLORS) {
-      if (state.colors[c]) count++;
-    }
-    onlineCount.textContent = count + ' 人在線';
-  }
-
-  function handleRoomClosed() {
-    unsubscribeRoom();
-    showToast('房間已關閉（超過 20 分鐘無操作或已被刪除）', 'info');
-    setTimeout(() => {
-      leaveRoom();
-    }, 1500);
-  }
-
-  function applyRemoteState(srv) {
-    // Detect join/leave by comparing colors
-    const oldColors = { ...state.colors };
-    const oldRoles = { ...state.roles };
-
+  function applyServerState(srv) {
     state.players = { ...srv.players };
     state.colors = { ...srv.colors };
     state.roles = JSON.parse(JSON.stringify(srv.roles || {}));
     state.errors = JSON.parse(JSON.stringify(srv.errors || {}));
     const msgChanged = JSON.stringify(state.messages) !== JSON.stringify(srv.messages || []);
     state.messages = JSON.parse(JSON.stringify(srv.messages || []));
-
-    // Check for join/leave events
-    for (const c of COLORS) {
-      if (!oldColors[c] && state.colors[c]) {
-        // Player joined
-        const roleId = state.roles[c] || '未登入';
-        if (state.colors[c] !== state.myId) {
-          addSystemMsg(`${COLOR_LABELS[c]}（${roleId}）加入了房間`);
-        }
-      } else if (oldColors[c] && !state.colors[c]) {
-        // Player left
-        const roleId = oldRoles[c] || '未登入';
-        if (oldColors[c] !== state.myId) {
-          addSystemMsg(`${COLOR_LABELS[c]}（${roleId}）離開了房間`);
-        }
-      }
-    }
 
     const gridChanged = !gridEquals(state.grid, srv.grid);
     if (gridChanged) {
@@ -2398,38 +1757,32 @@ body::before {
       }
     }
 
+    pulseDot.classList.remove('disconnected', 'reconnecting');
     setConnected(true);
     renderColorPicker();
     renderGrid();
     updatePathDisplay();
     updateRoomHeader();
-    updateOnlineCount();
     renderRoleAssignments();
     if (msgChanged) renderChat();
   }
 
-  async function leaveRoomOnDB() {
-    if (!state.roomCode) return;
-    try {
-      // Remove myself from players and colors
-      const updated = { ...state };
-      delete updated.players[state.myId];
-      for (const c of COLORS) {
-        if (updated.colors[c] === state.myId) updated.colors[c] = null;
-        if (updated.roles[c] === state.myRoleId) updated.roles[c] = null;
-      }
-
-      const { error } = await supabase
-        .from('rooms')
-        .update({
-          state: { grid: updated.grid, colors: updated.colors, roles: updated.roles, errors: updated.errors, messages: updated.messages, players: updated.players },
-          updated_at: new Date().toISOString()
-        })
-        .eq('room_code', state.roomCode);
-
-      if (error) console.error('Leave error:', error);
-    } catch (e) {}
+  function disconnectWS() {
+    stopPolling();
+    fetch(`${SERVER_URL}/leave`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ roomCode: state.roomCode, playerId: state.myId })
+    }).catch(() => {});
   }
+
+  async function apiSync() {
+    await syncToServer();
+  }
+
+  function getSharedState() { return null; }
+  function setSharedState(data) { syncToServer(); }
+  function clearSharedState() {}
 
   // ─── Navigation ───
   function showScreen(screen) {
@@ -2459,9 +1812,9 @@ body::before {
   // ─── Toast ───
   function showToast(message, type) {
     const toast = document.createElement('div');
-    toast.className = 'toast ' + type;
+    toast.className = `toast ${type}`;
     const icon = type === 'success' ? 'ph-bold ph-check' : 'ph-fill ph-warning-circle';
-    toast.innerHTML = '<i class="' + icon + '"></i> ' + message;
+    toast.innerHTML = `<i class="${icon}"></i> ${message}`;
     toastContainer.appendChild(toast);
 
     setTimeout(() => {
@@ -2471,25 +1824,29 @@ body::before {
   }
 
   // ─── Validation ───
-  function isValidPassword(pw) { return /^\d{2,4}$/.test(pw); }
-  function isValidCode(code) { return /^\d{6}$/.test(code); }
+  function isValidPassword(pw) {
+    return /^\d{2,4}$/.test(pw);
+  }
+
+  function isValidCode(code) {
+    return /^\d{6}$/.test(code);
+  }
 
   function formatRoomCode(code) {
     if (!code || code.length !== 6) return code || '--- ---';
     return code.slice(0, 3) + ' ' + code.slice(3);
   }
 
-  function cleanRoomCode(input) { return input.replace(/\s/g, ''); }
+  function cleanRoomCode(input) {
+    return input.replace(/\s/g, '');
+  }
 
   // ─── Room Management ───
-  function generateCode() { return String(Math.floor(100000 + Math.random() * 900000)); }
+  function generateCode() {
+    return String(Math.floor(100000 + Math.random() * 900000));
+  }
 
-  async function createRoom(password) {
-    if (!SUPABASE_URL || SUPABASE_URL === 'YOUR_SUPABASE_URL') {
-      showToast('請先在代碼中設定 SUPABASE_URL 和 SUPABASE_ANON_KEY！', 'error');
-      return;
-    }
-
+  function createRoom(password) {
     showLoading('建立房間中...');
     const code = generateCode();
     state.roomCode = code;
@@ -2503,33 +1860,19 @@ body::before {
     state.errors = {};
     state.grid = Array.from({ length: GRID_ROWS }, () => Array(GRID_COLS).fill(null));
     state.lastActivity = Date.now();
-    state.messages = [];
 
-    const ok = await createRoomOnDB(code, password);
-    if (!ok) {
+    connectWS(code, password, () => {
       hideLoading();
-      return;
-    }
-
-    subscribeToRoom(code);
-    hideLoading();
-    showScreen('room');
-    updateRoomHeader();
-    updateFooterInfo();
-    addSystemMsg('房間已建立');
-    showToast('房間建立成功！', 'success');
-    setConnected(true);
-
-    // Auto-login: restore saved role ID
-    autoLoginRole();
+      showScreen('room');
+      updateRoomHeader();
+      updateFooterInfo();
+      addSystemMsg('房間已建立');
+      showToast('房間建立成功！', 'success');
+      setConnected(true);
+    });
   }
 
-  async function joinRoom(code, password) {
-    if (!SUPABASE_URL || SUPABASE_URL === 'YOUR_SUPABASE_URL') {
-      showToast('請先在代碼中設定 SUPABASE_URL 和 SUPABASE_ANON_KEY！', 'error');
-      return;
-    }
-
+  function joinRoom(code, password) {
     showLoading('連接房間中...');
     state.roomCode = code;
     state.password = password;
@@ -2541,38 +1884,20 @@ body::before {
     state.myRoleId = null;
     state.errors = {};
     state.grid = Array.from({ length: GRID_ROWS }, () => Array(GRID_COLS).fill(null));
-    state.messages = [];
 
-    const ok = await joinRoomOnDB(code, password);
-    if (!ok) {
+    connectWS(code, password, () => {
       hideLoading();
-      return;
-    }
-
-    // Subscribe and add myself
-    subscribeToRoom(code);
-    
-    // Add player to room
-    if (!state.players[state.myId]) {
-      state.players[state.myId] = true;
-      await syncToServer();
-    }
-
-    hideLoading();
-    showScreen('room');
-    updateRoomHeader();
-    updateFooterInfo();
-    addSystemMsg('一名玩家加入了房間');
-    showToast('成功加入房間！', 'success');
-    setConnected(true);
-
-    // Auto-login: restore saved role ID
-    autoLoginRole();
+      showScreen('room');
+      updateRoomHeader();
+      updateFooterInfo();
+      addSystemMsg('一名玩家加入了房間');
+      showToast('成功加入房間！', 'success');
+      setConnected(true);
+    });
   }
 
-  async function leaveRoom() {
-    await leaveRoomOnDB();
-    unsubscribeRoom();
+  function leaveRoom() {
+    disconnectWS();
     clearRoomState();
     showScreen('home');
   }
@@ -2585,10 +1910,13 @@ body::before {
     state.players = {};
     state.colors = { orange: null, blue: null, pink: null, green: null };
     state.grid = Array.from({ length: GRID_ROWS }, () => Array(GRID_COLS).fill(null));
-    localStorage.removeItem('artale_assignedColor');
   }
 
-  // ─── Grid ───
+  // ─── Sync ───
+  function startSync() {
+    syncToServer();
+  }
+
   function gridEquals(a, b) {
     for (let r = 0; r < GRID_ROWS; r++) {
       for (let c = 0; c < GRID_COLS; c++) {
@@ -2610,7 +1938,6 @@ body::before {
       const { color } = payload;
       if (state.colors[color] === state.myId) {
         state.colors[color] = null;
-        localStorage.removeItem('artale_assignedColor');
       }
       state.myColor = null;
     } else if (type === 'update_door') {
@@ -2619,8 +1946,9 @@ body::before {
         if (state.grid[row][c] === color) state.grid[row][c] = null;
       }
       state.grid[row][col] = color;
+      // Only clear MY errors on this row, not teammates'
       for (let c = 0; c < GRID_COLS; c++) {
-        const key = row + ',' + c;
+        const key = `${row},${c}`;
         if (state.errors[key] && state.errors[key][state.myId]) {
           delete state.errors[key][state.myId];
           if (Object.keys(state.errors[key]).length === 0) {
@@ -2650,8 +1978,6 @@ body::before {
     if (!connected) {
       pulseDot.classList.add('disconnected');
       myName.textContent = '連線中斷';
-    } else {
-      pulseDot.classList.remove('disconnected');
     }
   }
 
@@ -2665,7 +1991,7 @@ body::before {
   }
 
   function updateFooterInfo() {
-    footerCopyText.textContent = 'Code: ' + formatRoomCode(state.roomCode) + ' | Password: ' + (state.password || '----') + ' | Share exactly how it feels.';
+    footerCopyText.textContent = `Code: ${formatRoomCode(state.roomCode)} | Password: ${state.password || '----'} | Share exactly how it feels.`;
   }
 
   function renderColorPicker() {
@@ -2679,7 +2005,6 @@ body::before {
         opt.classList.add('taken');
       }
     });
-    updateOnlineCount();
   }
 
   function renderGrid() {
@@ -2701,42 +2026,43 @@ body::before {
 
         if (cellColor) {
           btn.classList.add('marked', cellColor);
-          if (state.myColor && cellColor !== state.myColor) {
-            btn.classList.add('dimmed');
-          }
         }
 
-        const errKey = r + ',' + c;
+        // Error indicator
+        const errKey = `${r},${c}`;
         if (state.errors[errKey] && Object.keys(state.errors[errKey]).length > 0) {
           btn.classList.add('has-error');
           const entries = Object.values(state.errors[errKey]);
 
+          // Error badge with all markers' colors
           const badge = document.createElement('span');
           badge.className = 'error-badge';
-          badge.textContent = '\u2715';
+          badge.textContent = '✕';
           const colorMap = { orange: '#ff9800', blue: '#2196f3', pink: '#e91e63', green: '#4caf50' };
           const colors = entries.map(e => colorMap[e.color] || '#ef4444');
           if (colors.length === 1) {
             badge.style.backgroundColor = colors[0];
           } else if (colors.length === 2) {
-            badge.style.background = 'linear-gradient(90deg, ' + colors[0] + ' 50%, ' + colors[1] + ' 50%)';
+            badge.style.background = `linear-gradient(90deg, ${colors[0]} 50%, ${colors[1]} 50%)`;
           } else {
-            const stops = colors.map((cl, i) => cl + ' ' + (i / colors.length) * 100 + '% ' + ((i + 1) / colors.length) * 100 + '%').join(', ');
-            badge.style.background = 'conic-gradient(' + stops + ')';
+            const stops = colors.map((c, i) => `${c} ${(i / colors.length) * 100}% ${((i + 1) / colors.length) * 100}%`).join(', ');
+            badge.style.background = `conic-gradient(${stops})`;
           }
           btn.appendChild(badge);
 
+          // Tooltip with per-player colors
           const tip = document.createElement('span');
           tip.className = 'error-tooltip';
           const parts = entries.map(e => {
-            const cl = colorMap[e.color] || '#ef4444';
-            return '<span style="color:' + cl + '">' + (e.roleId || '?') + ' (' + (COLOR_LABELS[e.color] || '?') + ')</span>';
+            const c = colorMap[e.color] || '#ef4444';
+            return `<span style="color:${c}">${e.roleId || '?'} (${COLOR_LABELS[e.color] || '?'})</span>`;
           });
-          tip.innerHTML = '錯誤標記：' + parts.join('<span style="color:#888">、</span>');
+          tip.innerHTML = `錯誤標記：${parts.join('<span style="color:#888">、</span>')}`;
           tip.style.borderColor = colors[0];
           btn.appendChild(tip);
         }
 
+        // Lock if user hasn't selected a color
         if (!state.myColor) {
           btn.classList.add('locked');
         }
@@ -2762,6 +2088,7 @@ body::before {
     const currentColor = state.grid[row][col];
 
     if (currentColor === state.myColor) {
+      // Unmark - only allow unmarking the topmost marked row for this color
       let topMarked = -1;
       for (let r = 0; r < GRID_ROWS; r++) {
         if (state.grid[r].includes(state.myColor)) {
@@ -2775,6 +2102,8 @@ body::before {
       }
       pushMutation('clear_door', { row, col });
     } else if (currentColor === null) {
+      // Mark - sequential rule: only mark if the row below has at least one mark
+      // Row GRID_ROWS-1 (bottom) = Floor 1, can always be marked
       if (row < GRID_ROWS - 1) {
         const rowBelow = row + 1;
         const hasMarkBelow = state.grid[rowBelow].some(c => c === state.myColor);
@@ -2793,6 +2122,7 @@ body::before {
       return;
     }
 
+    // Sequential rule: must complete floor below first
     if (row < GRID_ROWS - 1) {
       const rowBelow = row + 1;
       const hasMarkBelow = state.grid[rowBelow].some(c => c === state.myColor);
@@ -2802,21 +2132,24 @@ body::before {
       }
     }
 
+    // If this row already has my own correct answer, block error marking
     const hasCorrectInRow = state.grid[row].some(c => c === state.myColor);
-    if (hasCorrectInRow && !state.errors[row + ',' + col]?.[state.myId]) {
+    if (hasCorrectInRow && !state.errors[`${row},${col}`]?.[state.myId]) {
       showToast('該層已有正確答案，無法再標記錯誤！', 'error');
       return;
     }
 
-    const errKey = row + ',' + col;
+    const errKey = `${row},${col}`;
     if (!state.errors[errKey]) state.errors[errKey] = {};
 
     if (state.errors[errKey][state.myId]) {
+      // Remove my error
       delete state.errors[errKey][state.myId];
       if (Object.keys(state.errors[errKey]).length === 0) {
         delete state.errors[errKey];
       }
     } else {
+      // Add my error
       state.errors[errKey][state.myId] = { roleId: state.myRoleId, color: state.myColor };
     }
 
@@ -2874,13 +2207,14 @@ body::before {
     const roleId = state.roles[state.myColor];
     if (roleId) {
       myRoleDisplay.classList.add('visible');
-      myRoleText.textContent = '你選擇了 ' + COLOR_LABELS[state.myColor] + '，角色 ID：' + roleId;
+      myRoleText.textContent = `你選擇了 ${COLOR_LABELS[state.myColor]}，角色 ID：${roleId}`;
     } else {
       myRoleDisplay.classList.remove('visible');
     }
   }
 
   // ─── Event Handlers ───
+  // Tabs
   $$('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const target = btn.dataset.target;
@@ -2891,6 +2225,7 @@ body::before {
     });
   });
 
+  // Create Room
   createBtn.addEventListener('click', () => {
     const pw = createPassword.value.trim();
     if (!isValidPassword(pw)) {
@@ -2904,6 +2239,7 @@ body::before {
     if (e.key === 'Enter') createBtn.click();
   });
 
+  // Join Room
   joinBtn.addEventListener('click', () => {
     const code = cleanRoomCode(joinCode.value.trim());
     const pw = joinPassword.value.trim();
@@ -2922,6 +2258,7 @@ body::before {
     if (e.key === 'Enter') joinBtn.click();
   });
 
+  // Color Picker
   colorPicker.addEventListener('click', (e) => {
     const option = e.target.closest('.color-option');
     if (!option) return;
@@ -2933,52 +2270,30 @@ body::before {
     }
 
     if (option.classList.contains('selected')) {
-      // Deselect: release color and its role assignment
+      // Deselect
       state.myColor = null;
-      state.roles[color] = null;
       pushMutation('release_color', { color });
     } else {
-      // Prevent duplicate role ID: if myRoleId is already assigned to another color by someone else
-      if (state.myRoleId && state.roles[color] && state.roles[color] !== state.myRoleId) {
-        showToast('這個顏色已被其他角色佔用，請選擇其他顏色！', 'error');
-        return;
-      }
+      // Release previous color
       if (state.myColor) {
-        // Switching from old color: release old color + clear old role assignment
-        state.roles[state.myColor] = null;
         pushMutation('release_color', { color: state.myColor });
       }
+      // Select new color
       state.myColor = color;
-      // Assign role ID to this color
-      if (state.myRoleId) {
-        state.roles[color] = state.myRoleId;
-      }
       const success = pushMutation('update_color', { color });
       if (!success) {
         state.myColor = null;
         return;
       }
-      syncToServer();
     }
 
     renderGrid();
-    renderRoleAssignments();
     updatePathDisplay();
     updateFooterInfo();
     updateMyRoleDisplay();
   });
 
-  // Auto-login: restore previously saved role ID (only sets myRoleId, color assignment happens when user picks a color)
-  async function autoLoginRole() {
-    const savedRoleId = localStorage.getItem('artale_roleId');
-    if (!savedRoleId) return;
-    if (state.myRoleId) return;
-
-    state.myRoleId = savedRoleId;
-    roleInput.value = savedRoleId;
-    addSystemMsg(`自動登入角色 ID：${savedRoleId}，請選擇顏色房號即可開始`);
-  }
-
+  // Role Login
   roleConfirmBtn.addEventListener('click', () => {
     const roleId = roleInput.value.trim();
     if (!roleId) {
@@ -2990,22 +2305,13 @@ body::before {
       return;
     }
 
-    // Prevent duplicate: check if this roleId is already used by another color
-    for (let c in state.roles) {
-      if (c !== state.myColor && state.roles[c] === roleId) {
-        showToast(`角色 ID「${roleId}」已被 ${COLOR_LABELS[c]} 使用，請更換 ID！`, 'error');
-        return;
-      }
-    }
-
     state.myRoleId = roleId;
     state.roles[state.myColor] = roleId;
     localStorage.setItem('artale_roleId', roleId);
-    localStorage.setItem('artale_assignedColor', state.myColor);
     syncToServer();
 
     renderRoleAssignments();
-    showToast('角色「' + roleId + '」已登入為 ' + COLOR_LABELS[state.myColor] + '！', 'success');
+    showToast(`角色「${roleId}」已登入為 ${COLOR_LABELS[state.myColor]}！`, 'success');
   });
 
   roleInput.addEventListener('keydown', (e) => {
@@ -3051,7 +2357,7 @@ body::before {
         div.textContent = msg.text;
       } else {
         const c = colorMap[msg.color] || '#ccc';
-        div.innerHTML = '<span class="name" style="color:' + c + '">' + msg.roleId + ':</span> ' + msg.text;
+        div.innerHTML = `<span class="name" style="color:${c}">${msg.roleId}:</span> ${msg.text}`;
       }
       chatMessages.appendChild(div);
     });
@@ -3063,8 +2369,9 @@ body::before {
     if (e.key === 'Enter') sendChatMessage();
   });
 
+  // Copy Room Info
   $('#copy-btn').addEventListener('click', () => {
-    const info = 'Code: ' + formatRoomCode(state.roomCode) + '\nPassword: ' + state.password + '\nLink: ' + window.location.origin + window.location.pathname + '#/' + state.roomCode + '/' + state.password;
+    const info = `Code: ${formatRoomCode(state.roomCode)}\nPassword: ${state.password}\nLink: ${window.location.origin}${window.location.pathname}#/${state.roomCode}/${state.password}`;
     navigator.clipboard.writeText(info).then(() => {
       showToast('已複製房間資訊 (Copied)', 'success');
     }).catch(() => {
@@ -3072,6 +2379,7 @@ body::before {
     });
   });
 
+  // Copy Path
   $('#copy-path-btn').addEventListener('click', () => {
     const path = myPathInput.value.trim();
     if (!path) {
@@ -3085,16 +2393,19 @@ body::before {
     });
   });
 
+  // Clear All
   $('#clear-all-btn').addEventListener('click', () => {
     if (!confirm('確定要重新開始嗎？這將會清除你所有的跳台標記。')) return;
     pushMutation('clear_all_grid', {});
     showToast('已重新開始', 'success');
   });
 
+  // Exit Room
   $('#home-btn').addEventListener('click', () => {
     leaveRoom();
   });
 
+  // Help Modal
   $('#help-btn').addEventListener('click', () => {
     helpModal.classList.remove('hidden');
   });
@@ -3105,12 +2416,26 @@ body::before {
     if (e.target === helpModal) helpModal.classList.add('hidden');
   });
 
+  // Cat Modal
+  $('#cat-btn').addEventListener('click', () => {
+    catModal.classList.remove('hidden');
+  });
+  $('#cat-close').addEventListener('click', () => {
+    catModal.classList.add('hidden');
+  });
+  catModal.addEventListener('click', (e) => {
+    if (e.target === catModal) catModal.classList.add('hidden');
+  });
+
+  // Keyboard
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       helpModal.classList.add('hidden');
+      catModal.classList.add('hidden');
     }
   });
 
+  // Auto-focus on tab switch
   document.addEventListener('click', (e) => {
     if (e.target.classList.contains('tab-btn')) {
       const target = e.target.dataset.target;
@@ -3122,6 +2447,8 @@ body::before {
     }
   });
 
+  // ─── Session Recovery ───
+  // ─── Visibility API ───
   document.addEventListener('visibilitychange', () => {
     if (state.screen !== 'room') return;
     if (!document.hidden) {
@@ -3129,198 +2456,15 @@ body::before {
     }
   });
 
+  // ─── Page Unload ───
   window.addEventListener('beforeunload', () => {
-    leaveRoomOnDB();
-    unsubscribeRoom();
+    disconnectWS();
   });
 
+  // ─── Init ───
   const savedRoleId = localStorage.getItem('artale_roleId');
   if (savedRoleId) roleInput.value = savedRoleId;
   showScreen('home');
-
-  // ═══ Team Finder ═══
-  let teamListings = [];
-
-  const toggleTeamFormBtn = document.getElementById('toggle-team-form-btn');
-  const teamFormEl = document.getElementById('team-form');
-  const cancelTeamBtn = document.getElementById('cancel-team-btn');
-  const submitTeamBtn = document.getElementById('submit-team-btn');
-  const channelInput = document.getElementById('channel-input');
-  const lobbyEmpty = document.getElementById('lobby-empty');
-  const lobbyList = document.getElementById('lobby-list');
-  const maxPlayersInput = document.getElementById('max-players-input');
-  const lobbyFilter = document.getElementById('lobby-filter');
-  const lobbyTitle = document.getElementById('lobby-title');
-  let currentFilter = 'all';
-
-  toggleTeamFormBtn.addEventListener('click', () => {
-    const isVisible = teamFormEl.style.display !== 'none';
-    teamFormEl.style.display = isVisible ? 'none' : 'block';
-    toggleTeamFormBtn.innerHTML = isVisible
-      ? '<i class="ph ph-plus-circle"></i> 發布組隊信息'
-      : '<i class="ph ph-minus-circle"></i> 收起表單';
-  });
-
-  cancelTeamBtn.addEventListener('click', () => {
-    teamFormEl.style.display = 'none';
-    toggleTeamFormBtn.innerHTML = '<i class="ph ph-plus-circle"></i> 發布組隊信息';
-  });
-
-  channelInput.addEventListener('input', () => {
-    channelInput.value = channelInput.value.replace(/[^0-9]/g, '');
-  });
-
-  maxPlayersInput.addEventListener('input', () => {
-    let val = maxPlayersInput.value.replace(/[^0-9]/g, '');
-    if (val !== '' && parseInt(val) > 6) val = '6';
-    if (val !== '' && parseInt(val) < 2) val = '2';
-    maxPlayersInput.value = val;
-  });
-
-  submitTeamBtn.addEventListener('click', () => {
-    const dungeon = document.querySelector('input[name="dungeon"]:checked');
-    const dungeonVal = dungeon ? dungeon.value : '羅密歐';
-    const roleChecks = document.querySelectorAll('#role-group input[type="checkbox"]:checked');
-    const roles = Array.from(roleChecks).map(cb => cb.value);
-    const channelVal = channelInput.value.trim();
-    const maxVal = maxPlayersInput.value.trim();
-    const maxPlayers = maxVal ? Math.min(Math.max(parseInt(maxVal), 2), 6) : 4;
-    const publisherId = state.myRoleId || '未知玩家';
-
-    if (roles.length === 0) { alert('請至少選擇一個空缺隊員！'); return; }
-    if (!channelVal || parseInt(channelVal) < 1) { alert('請輸入有效的頻道號碼（正整數）！'); return; }
-
-    teamListings.unshift({
-      id: Date.now(),
-      dungeon: dungeonVal,
-      roles: roles,
-      channel: channelVal,
-      maxPlayers: maxPlayers,
-      publisherId: publisherId,
-      joinedPlayers: [],
-      time: new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }),
-      timestamp: Date.now()
-    });
-
-    renderTeamLobby();
-    document.querySelector('input[name="dungeon"][value="羅密歐"]').checked = true;
-    roleChecks.forEach(cb => cb.checked = false);
-    channelInput.value = '';
-    maxPlayersInput.value = '';
-    teamFormEl.style.display = 'none';
-    toggleTeamFormBtn.innerHTML = '<i class="ph ph-plus-circle"></i> 發布組隊信息';
-  });
-
-  function renderTeamLobby() {
-    // B: 清理過期（超過 30 分鐘）
-    const now = Date.now();
-    const EXPIRY = 30 * 60 * 1000;
-    const EXPIRING = 5 * 60 * 1000;
-    teamListings = teamListings.filter(item => now - item.timestamp < EXPIRY);
-
-    if (teamListings.length === 0) {
-      lobbyEmpty.style.display = 'block';
-      lobbyList.style.display = 'none';
-      lobbyFilter.style.display = 'none';
-      lobbyTitle.style.display = 'none';
-      return;
-    }
-
-    // C: 副本篩選
-    const filtered = currentFilter === 'all'
-      ? teamListings
-      : teamListings.filter(item => item.dungeon === currentFilter);
-
-    lobbyEmpty.style.display = 'none';
-    lobbyFilter.style.display = 'flex';
-    lobbyList.style.display = 'flex';
-    lobbyTitle.style.display = 'flex';
-
-    // 渲染篩選按鈕 active 狀態
-    lobbyFilter.querySelectorAll('.filter-chip').forEach(chip => {
-      chip.classList.toggle('active', chip.dataset.filter === currentFilter);
-    });
-
-    lobbyList.innerHTML = filtered.map((item, i) => {
-      const roleTags = item.roles.map(r => {
-        const cls = r === '打手' ? 'dps' : r === '法師' ? 'mage' : 'thief';
-        return '<span class="role-tag ' + cls + '">' + r + '</span>';
-      }).join('');
-
-      // D: 人數計算
-      const joinedCount = (item.joinedPlayers || []).length;
-      const remaining = item.maxPlayers - joinedCount;
-      const isFull = remaining <= 0;
-      const isOwn = state.myRoleId && state.myRoleId === item.publisherId;
-
-      // B: 快過期標記
-      const timeLeft = EXPIRY - (now - item.timestamp);
-      const expiring = timeLeft < EXPIRING;
-
-      // join button
-      let joinBtnHTML;
-      if (isOwn) {
-        joinBtnHTML = '<span class="team-publisher">我的發布</span>';
-      } else if (isFull) {
-        joinBtnHTML = '<button class="join-team-btn" data-id="' + item.id + '" disabled><i class="ph ph-handshake"></i> 已滿</button>';
-      } else {
-        joinBtnHTML = '<button class="join-team-btn" data-id="' + item.id + '"><i class="ph ph-handshake"></i> 參加 (剩餘 ' + remaining + ' 位)</button>';
-      }
-
-      return '<div class="team-card' + (expiring ? ' expiring' : '') + (i === 0 ? ' highlight-card' : '') + '" data-id="' + item.id + '">' +
-        '<div class="team-card-left"><span class="team-dungeon ' + (item.dungeon === '羅密歐' ? 'dungeon-romeo' : 'dungeon-juliet') + '">' + item.dungeon + '</span>' +
-        '<span class="team-publisher">' + (item.publisherId || '未知玩家') + '</span>' +
-        '<div class="team-roles">' + roleTags + '</div></div>' +
-        '<div class="team-card-right">' +
-        '<span class="team-channel"><i class="ph ph-broadcast"></i> CH.' + item.channel + '</span>' +
-        '<span class="team-time">' + item.time + '</span>' + joinBtnHTML +
-        (isOwn ? '<button class="delete-team-btn" data-id="' + item.id + '"><i class="ph ph-x-circle"></i></button>' : '') + '</div></div>';
-    }).join('');
-
-    lobbyList.querySelectorAll('.delete-team-btn').forEach(btn => {
-      btn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        teamListings = teamListings.filter(item => item.id !== parseInt(this.dataset.id));
-        currentFilter = 'all';
-        renderTeamLobby();
-      });
-    });
-
-    lobbyList.querySelectorAll('.join-team-btn:not([disabled])').forEach(btn => {
-      btn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        const listingId = parseInt(this.dataset.id);
-        const listing = teamListings.find(item => item.id === listingId);
-        if (!listing) return;
-        const myId = state.myRoleId || '未知玩家';
-        if (myId === listing.publisherId) return;
-        if (!listing.joinedPlayers) listing.joinedPlayers = [];
-        if (listing.joinedPlayers.includes(myId)) {
-          alert('你已經參加了這個隊伍！');
-          return;
-        }
-        if (listing.joinedPlayers.length >= listing.maxPlayers) {
-          alert('隊伍已滿！');
-          renderTeamLobby();
-          return;
-        }
-        listing.joinedPlayers.push(myId);
-        renderTeamLobby();
-      });
-    });
-    setTimeout(function() {
-      lobbyList.querySelectorAll('.highlight-card').forEach(function(el) { el.classList.remove('highlight-card'); });
-    }, 600);
-  }
-
-  // C: 篩選按鈕事件
-  lobbyFilter.addEventListener('click', (e) => {
-    const chip = e.target.closest('.filter-chip');
-    if (!chip) return;
-    currentFilter = chip.dataset.filter;
-    renderTeamLobby();
-  });
-
 })();
 </script>
 </body>
