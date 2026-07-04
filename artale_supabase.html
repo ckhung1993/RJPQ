@@ -106,7 +106,7 @@ body::before {
 }
 
 .home-right {
-  width: 380px;
+  width: 440px;
   flex-shrink: 0;
   margin-top: 40px;
 }
@@ -587,15 +587,14 @@ body::before {
 /* Team Card */
 .team-card {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  flex-direction: column;
+  gap: 10px;
   width: 100%;
   box-sizing: border-box;
   background: rgba(255,255,255,0.04);
   border: 1px solid var(--glass-border);
   border-radius: 10px;
-  padding: 12px 16px;
+  padding: 14px 16px;
   transition: border-color 0.2s ease;
 }
 
@@ -603,12 +602,38 @@ body::before {
   border-color: var(--primary);
 }
 
-.team-card-left {
+.tc-top {
   display: flex;
   align-items: center;
-  gap: 14px;
-  flex: 1;
-  min-width: 0;
+  gap: 10px;
+}
+
+.tc-mid {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.tc-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tc-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.team-count {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.team-publisher {
+  color: var(--text-secondary);
 }
 
 .team-dungeon {
@@ -648,13 +673,6 @@ body::before {
 .role-tag.dps { background: rgba(239,68,68,0.15); color: #ef4444; }
 .role-tag.mage { background: rgba(59,130,246,0.15); color: #3b82f6; }
 .role-tag.thief { background: rgba(168,85,247,0.15); color: #a855f7; }
-
-.team-card-right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-shrink: 0;
-}
 
 .team-channel {
   font-size: 13px;
@@ -3143,8 +3161,6 @@ body::before {
   showScreen('home');
 
   // ═══ Team Finder ═══
-  let teamListings = [];
-
   const toggleTeamFormBtn = document.getElementById('toggle-team-form-btn');
   const teamFormEl = document.getElementById('team-form');
   const cancelTeamBtn = document.getElementById('cancel-team-btn');
@@ -3181,7 +3197,7 @@ body::before {
     maxPlayersInput.value = val;
   });
 
-  submitTeamBtn.addEventListener('click', () => {
+  submitTeamBtn.addEventListener('click', async () => {
     const dungeon = document.querySelector('input[name="dungeon"]:checked');
     const dungeonVal = dungeon ? dungeon.value : '羅密歐';
     const roleChecks = document.querySelectorAll('#role-group input[type="checkbox"]:checked');
@@ -3194,52 +3210,73 @@ body::before {
     if (roles.length === 0) { alert('請至少選擇一個空缺隊員！'); return; }
     if (!channelVal || parseInt(channelVal) < 1) { alert('請輸入有效的頻道號碼（正整數）！'); return; }
 
-    teamListings.unshift({
-      id: Date.now(),
+    const id = Date.now() * 1000 + Math.floor(Math.random() * 1000);
+    const { error } = await supabase.from('team_listings').insert({
+      id: id,
       dungeon: dungeonVal,
       roles: roles,
       channel: channelVal,
-      maxPlayers: maxPlayers,
-      publisherId: publisherId,
-      publisherUid: state.myId,
-      joinedPlayers: [],
+      max_players: maxPlayers,
+      publisher_id: publisherId,
+      publisher_uid: state.myId,
+      joined_players: [],
       time: new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }),
       timestamp: Date.now()
     });
 
-    renderTeamLobby();
+    if (error) {
+      if (error.message && error.message.includes('does not exist')) {
+        alert('資料表尚未建立，請先在 Supabase SQL Editor 執行建表 SQL。');
+      } else {
+        console.error('Insert team_listings error:', error);
+        alert('發布失敗，請再試一次。');
+      }
+      return;
+    }
+
+    await renderTeamLobby();
     document.querySelector('input[name="dungeon"][value="羅密歐"]').checked = true;
-    roleChecks.forEach(cb => cb.checked = false);
+    document.querySelectorAll('#role-group input[type="checkbox"]:checked').forEach(cb => cb.checked = false);
     channelInput.value = '';
     maxPlayersInput.value = '';
     teamFormEl.style.display = 'none';
     toggleTeamFormBtn.innerHTML = '<i class="ph ph-plus-circle"></i> 發布組隊信息';
   });
 
-  function renderTeamLobby() {
-    // B: 清理過期（超過 30 分鐘）
+  async function renderTeamLobby() {
     const now = Date.now();
     const EXPIRY = 30 * 60 * 1000;
     const EXPIRING = 5 * 60 * 1000;
-    teamListings = teamListings.filter(item => now - item.timestamp < EXPIRY);
 
-    if (teamListings.length === 0) {
+    const { data, error } = await supabase
+      .from('team_listings')
+      .select('*')
+      .gte('timestamp', now - EXPIRY)
+      .order('timestamp', { ascending: false });
+
+    if (error) {
+      console.error('renderTeamLobby fetch error:', error);
       lobbyEmpty.style.display = 'block';
       lobbyList.style.display = 'none';
       lobbyFilter.style.display = 'none';
       return;
     }
 
-    // C: 副本篩選
+    if (!data || data.length === 0) {
+      lobbyEmpty.style.display = 'block';
+      lobbyList.style.display = 'none';
+      lobbyFilter.style.display = 'none';
+      return;
+    }
+
     const filtered = currentFilter === 'all'
-      ? teamListings
-      : teamListings.filter(item => item.dungeon === currentFilter);
+      ? data
+      : data.filter(item => item.dungeon === currentFilter);
 
     lobbyEmpty.style.display = 'none';
     lobbyFilter.style.display = 'flex';
     lobbyList.style.display = 'flex';
 
-    // 渲染篩選按鈕 active 狀態
     lobbyFilter.querySelectorAll('.filter-chip').forEach(chip => {
       chip.classList.toggle('active', chip.dataset.filter === currentFilter);
     });
@@ -3250,17 +3287,14 @@ body::before {
         return '<span class="role-tag ' + cls + '">' + r + '</span>';
       }).join('');
 
-      // D: 人數計算
-      const joinedCount = (item.joinedPlayers || []).length;
-      const remaining = item.maxPlayers - joinedCount;
+      const joinedCount = (item.joined_players || []).length;
+      const remaining = item.max_players - joinedCount;
       const isFull = remaining <= 0;
-      const isOwn = state.myId === item.publisherUid;
+      const isOwn = state.myId === item.publisher_uid;
 
-      // B: 快過期標記
       const timeLeft = EXPIRY - (now - item.timestamp);
       const expiring = timeLeft < EXPIRING;
 
-      // join button
       let joinBtnHTML;
       if (isOwn) {
         joinBtnHTML = '<span class="team-publisher">我的發布</span>';
@@ -3271,62 +3305,76 @@ body::before {
       }
 
       return '<div class="team-card' + (expiring ? ' expiring' : '') + (i === 0 ? ' highlight-card' : '') + '" data-id="' + item.id + '">' +
-        '<div class="team-card-left"><span class="team-dungeon ' + (item.dungeon === '羅密歐' ? 'dungeon-romeo' : 'dungeon-juliet') + '">' + item.dungeon + '</span>' +
-        '<span class="team-publisher">' + (item.publisherId || '未知玩家') + '</span>' +
-        '<div class="team-roles">' + roleTags + '</div></div>' +
-        '<div class="team-card-right">' +
+        '<div class="tc-top">' +
+        '<span class="team-dungeon ' + (item.dungeon === '羅密歐' ? 'dungeon-romeo' : 'dungeon-juliet') + '">' + item.dungeon + '</span>' +
         '<span class="team-channel"><i class="ph ph-broadcast"></i> CH.' + item.channel + '</span>' +
-        '<span class="team-time">' + item.time + '</span>' + joinBtnHTML +
-        (isOwn ? '<button class="delete-team-btn" data-id="' + item.id + '"><i class="ph ph-x-circle"></i></button>' : '') + '</div></div>';
+        '<span class="team-time">' + item.time + '</span>' +
+        '</div>' +
+        '<div class="tc-mid">' +
+        '<span class="team-publisher">發布者: ' + (item.publisher_id || '未知玩家') + '</span>' +
+        '<span class="team-count">' + joinedCount + '/' + item.max_players + ' 人</span>' +
+        '</div>' +
+        '<div class="tc-bottom">' +
+        '<div class="team-roles">' + roleTags + '</div>' +
+        '<div class="tc-actions">' + joinBtnHTML +
+        (isOwn ? '<button class="delete-team-btn" data-id="' + item.id + '"><i class="ph ph-x-circle"></i></button>' : '') +
+        '</div></div></div>';
     }).join('');
-
 
     setTimeout(function() {
       lobbyList.querySelectorAll('.highlight-card').forEach(function(el) { el.classList.remove('highlight-card'); });
     }, 600);
   }
 
+  supabase
+    .channel('team-listings-realtime')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'team_listings' }, () => {
+      renderTeamLobby();
+    })
+    .subscribe();
+
   // 組隊大廳事件委託（刪除 + 參加，只綁定一次）
-  lobbyList.addEventListener('click', function(e) {
-    // 刪除按鈕
+  lobbyList.addEventListener('click', async function(e) {
     const delBtn = e.target.closest('.delete-team-btn');
     if (delBtn) {
       e.stopPropagation();
-      teamListings = teamListings.filter(item => item.id !== parseInt(delBtn.dataset.id));
+      const { error } = await supabase.from('team_listings').delete().eq('id', parseInt(delBtn.dataset.id));
+      if (error) console.error('Delete team_listings error:', error);
       currentFilter = 'all';
-      renderTeamLobby();
+      await renderTeamLobby();
       return;
     }
-    // 參加按鈕
     const joinBtn = e.target.closest('.join-team-btn');
     if (joinBtn && !joinBtn.disabled) {
       e.stopPropagation();
       const listingId = parseInt(joinBtn.dataset.id);
-      const listing = teamListings.find(item => item.id === listingId);
-      if (!listing) { console.log('join: listing not found', listingId); return; }
-      if (state.myId === listing.publisherUid) { console.log('join: own listing, skip'); return; }
+      const { data: listingData, error: fetchErr } = await supabase.from('team_listings').select('*').eq('id', listingId).single();
+      if (fetchErr || !listingData) { console.log('join: listing not found', listingId); return; }
+      if (state.myId === listingData.publisher_uid) { console.log('join: own listing, skip'); return; }
       const myId = state.myRoleId || state.myId;
-      if (!listing.joinedPlayers) listing.joinedPlayers = [];
-      if (listing.joinedPlayers.includes(myId)) {
+      const joinedPlayers = listingData.joined_players || [];
+      if (joinedPlayers.includes(myId)) {
         alert('你已經參加了這個隊伍！');
         return;
       }
-      if (listing.joinedPlayers.length >= listing.maxPlayers) {
+      if (joinedPlayers.length >= listingData.max_players) {
         alert('隊伍已滿！');
-        renderTeamLobby();
+        await renderTeamLobby();
         return;
       }
-      listing.joinedPlayers.push(myId);
-      renderTeamLobby();
+      const newJoined = [...joinedPlayers, myId];
+      const { error: updateErr } = await supabase.from('team_listings').update({ joined_players: newJoined }).eq('id', listingId);
+      if (updateErr) console.error('Update team_listings error:', updateErr);
+      await renderTeamLobby();
     }
   });
 
   // C: 篩選按鈕事件
-  lobbyFilter.addEventListener('click', (e) => {
+  lobbyFilter.addEventListener('click', async (e) => {
     const chip = e.target.closest('.filter-chip');
     if (!chip) return;
     currentFilter = chip.dataset.filter;
-    renderTeamLobby();
+    await renderTeamLobby();
   });
 
 })();
