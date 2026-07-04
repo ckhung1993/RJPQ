@@ -708,6 +708,34 @@ body::before {
   background: rgba(239,68,68,0.1);
 }
 
+/* ── Depart Team Button ── */
+.depart-team-btn {
+  background: linear-gradient(135deg, rgba(168,85,247,0.2), rgba(139,92,246,0.2));
+  border: 1px solid rgba(168,85,247,0.4);
+  color: #c084fc;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 7px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+}
+.depart-team-btn:hover {
+  background: linear-gradient(135deg, rgba(168,85,247,0.35), rgba(139,92,246,0.35));
+  border-color: #c084fc;
+  box-shadow: 0 0 14px rgba(168,85,247,0.3);
+  transform: translateY(-1px);
+}
+.depart-team-btn:active {
+  transform: translateY(0);
+}
+
 /* ── Join Team Button ── */
 .join-team-btn {
   background: linear-gradient(135deg, rgba(34,197,94,0.2), rgba(16,185,129,0.2));
@@ -802,18 +830,18 @@ body::before {
 }
 
 .filter-chip[data-filter="羅密歐"]:hover {
-  color: #93c5fd;
-  background: rgba(59,130,246,0.08);
+  color: #d4a76a;
+  background: rgba(181,131,90,0.08);
 }
 
 .filter-chip[data-filter="羅密歐"].active {
-  background: rgba(59,130,246,0.18);
-  color: #93c5fd;
-  box-shadow: 0 0 12px rgba(59,130,246,0.2);
+  background: rgba(181,131,90,0.18);
+  color: #d4a76a;
+  box-shadow: 0 0 12px rgba(181,131,90,0.2);
 }
 
 .filter-chip[data-filter="羅密歐"].active::after {
-  background: #60a5fa;
+  background: #c4956b;
 }
 
 .filter-chip[data-filter="茱麗葉"]:hover {
@@ -829,6 +857,51 @@ body::before {
 
 .filter-chip[data-filter="茱麗葉"].active::after {
   background: #facc15;
+}
+
+/* 狀態篩選晶片 */
+.filter-chip[data-filter="recruiting"]:hover {
+  color: #22c55e;
+  background: rgba(34,197,94,0.08);
+}
+.filter-chip[data-filter="recruiting"].active {
+  background: rgba(34,197,94,0.18);
+  color: #22c55e;
+  box-shadow: 0 0 12px rgba(34,197,94,0.2);
+}
+.filter-chip[data-filter="recruiting"].active::after {
+  background: #22c55e;
+}
+.filter-chip[data-filter="departed"]:hover {
+  color: #a78bfa;
+  background: rgba(167,139,250,0.08);
+}
+.filter-chip[data-filter="departed"].active {
+  background: rgba(167,139,250,0.18);
+  color: #a78bfa;
+  box-shadow: 0 0 12px rgba(167,139,250,0.2);
+}
+.filter-chip[data-filter="departed"].active::after {
+  background: #a78bfa;
+}
+
+/* 隊伍狀態標籤 */
+.team-status {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.team-status.recruiting {
+  background: rgba(34,197,94,0.15);
+  color: #22c55e;
+}
+.team-status.departed {
+  background: rgba(167,139,250,0.15);
+  color: #a78bfa;
 }
 
 .highlight-card {
@@ -1835,6 +1908,140 @@ body::before {
     width: 260px;
   }
 }
+
+/* ── 角色登入按鈕（主頁右上方） ── */
+.login-btn-corner {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 12px rgba(99,102,241,0.3);
+}
+.login-btn-corner:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(99,102,241,0.4);
+}
+.login-btn-corner.logged-in {
+  background: rgba(34,197,94,0.15);
+  color: #22c55e;
+  box-shadow: none;
+}
+.login-btn-corner.logged-in:hover {
+  background: rgba(34,197,94,0.25);
+}
+.login-btn-corner .ph {
+  font-size: 16px;
+}
+
+/* ── 登入面板（下拉式） ── */
+.login-panel {
+  position: absolute;
+  top: 48px;
+  right: 0;
+  width: 280px;
+  background: #1a1530;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  z-index: 20;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+  display: none;
+}
+.login-panel.open {
+  display: block;
+}
+.login-panel-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.login-field {
+  margin-bottom: 12px;
+}
+.login-field label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.login-field input,
+.login-field select {
+  width: 100%;
+  padding: 8px 10px;
+  background: rgba(255,255,255,0.06);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-family: var(--font);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.login-field input:focus,
+.login-field select:focus {
+  border-color: var(--primary);
+}
+.login-field select option {
+  background: #1a1530;
+  color: var(--text-primary);
+}
+.login-panel-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+.login-panel-actions button {
+  flex: 1;
+  padding: 8px 0;
+  border-radius: 8px;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.login-save-btn {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+}
+.login-save-btn:hover {
+  background: var(--primary-hover);
+}
+.login-logout-btn {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1.5px solid var(--border);
+}
+.login-logout-btn:hover {
+  background: rgba(239,68,68,0.1);
+  border-color: var(--danger);
+  color: var(--danger);
+}
+.home-layout {
+  position: relative;
+}
 </style>
 </head>
 <body>
@@ -1846,6 +2053,36 @@ body::before {
   <!-- HOME SCREEN -->
   <div id="home-screen" class="view-screen active">
     <div class="home-layout">
+
+      <!-- 角色登入按鈕 + 面板 -->
+      <button class="login-btn-corner" id="login-btn-corner">
+        <i class="ph ph-user-circle"></i> <span id="login-btn-text">角色登入</span>
+      </button>
+      <div class="login-panel" id="login-panel">
+        <div class="login-panel-title"><i class="ph ph-identification-card"></i> 角色登入</div>
+        <div class="login-field">
+          <label>角色 ID</label>
+          <input type="text" id="login-role-id" placeholder="例如：ArcherKing" maxlength="20">
+        </div>
+        <div class="login-field">
+          <label>等級</label>
+          <input type="text" id="login-level" placeholder="例如：70" inputmode="numeric" maxlength="3">
+        </div>
+        <div class="login-field">
+          <label>職業</label>
+          <select id="login-class">
+            <option value="">選擇職業</option>
+            <option value="打手">打手</option>
+            <option value="法師">法師</option>
+            <option value="盜賊">盜賊</option>
+          </select>
+        </div>
+        <div class="login-panel-actions">
+          <button class="login-save-btn" id="login-save-btn">登入</button>
+          <button class="login-logout-btn" id="login-logout-btn" style="display:none;">登出</button>
+        </div>
+      </div>
+
       <div class="home-left">
     <div class="characters-row">
       <img class="char-img left" src="data:image/png;base64,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" alt="茱麗葉">
@@ -1973,6 +2210,8 @@ body::before {
             <button class="filter-chip active" data-filter="all"><i class="ph ph-list"></i> 全部</button>
             <button class="filter-chip" data-filter="羅密歐"><i class="ph ph-crown"></i> 羅密歐</button>
             <button class="filter-chip" data-filter="茱麗葉"><i class="ph ph-flower"></i> 茱麗葉</button>
+            <button class="filter-chip" data-filter="recruiting"><i class="ph ph-hourglass-simple"></i> 等待組隊</button>
+            <button class="filter-chip" data-filter="departed"><i class="ph ph-rocket-launch"></i> 已出戰</button>
           </div>
           <div class="lobby-list" id="lobby-list"></div>
         </div>
@@ -3154,6 +3393,78 @@ body::before {
   if (savedRoleId) roleInput.value = savedRoleId;
   showScreen('home');
 
+  // ═══ 角色登入面板 ═══
+  const loginBtnCorner = document.getElementById('login-btn-corner');
+  const loginBtnText = document.getElementById('login-btn-text');
+  const loginPanel = document.getElementById('login-panel');
+  const loginRoleId = document.getElementById('login-role-id');
+  const loginLevel = document.getElementById('login-level');
+  const loginClass = document.getElementById('login-class');
+  const loginSaveBtn = document.getElementById('login-save-btn');
+  const loginLogoutBtn = document.getElementById('login-logout-btn');
+
+  // 恢復已登入狀態
+  let playerProfile = null;
+  try {
+    const saved = localStorage.getItem('artale_playerProfile');
+    if (saved) playerProfile = JSON.parse(saved);
+  } catch(e) {}
+  if (playerProfile) {
+    loginBtnCorner.classList.add('logged-in');
+    loginBtnText.textContent = playerProfile.roleId;
+    loginRoleId.value = playerProfile.roleId;
+    loginLevel.value = playerProfile.level || '';
+    loginClass.value = playerProfile.class || '';
+    loginSaveBtn.style.display = 'none';
+    loginLogoutBtn.style.display = '';
+    state.myRoleId = playerProfile.roleId;
+    roleInput.value = playerProfile.roleId;
+  }
+
+  loginBtnCorner.addEventListener('click', (e) => {
+    e.stopPropagation();
+    loginPanel.classList.toggle('open');
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!loginPanel.contains(e.target) && e.target !== loginBtnCorner && !loginBtnCorner.contains(e.target)) {
+      loginPanel.classList.remove('open');
+    }
+  });
+
+  loginSaveBtn.addEventListener('click', () => {
+    const rid = loginRoleId.value.trim();
+    if (!rid) { alert('請輸入角色 ID！'); return; }
+    playerProfile = {
+      roleId: rid,
+      level: loginLevel.value.trim(),
+      class: loginClass.value
+    };
+    localStorage.setItem('artale_playerProfile', JSON.stringify(playerProfile));
+    state.myRoleId = rid;
+    roleInput.value = rid;
+    loginBtnCorner.classList.add('logged-in');
+    loginBtnText.textContent = rid;
+    loginSaveBtn.style.display = 'none';
+    loginLogoutBtn.style.display = '';
+    loginPanel.classList.remove('open');
+  });
+
+  loginLogoutBtn.addEventListener('click', () => {
+    playerProfile = null;
+    localStorage.removeItem('artale_playerProfile');
+    state.myRoleId = null;
+    roleInput.value = '';
+    loginRoleId.value = '';
+    loginLevel.value = '';
+    loginClass.value = '';
+    loginBtnCorner.classList.remove('logged-in');
+    loginBtnText.textContent = '角色登入';
+    loginSaveBtn.style.display = '';
+    loginLogoutBtn.style.display = 'none';
+    loginPanel.classList.remove('open');
+  });
+
   // ═══ Team Finder ═══
   const toggleTeamFormBtn = document.getElementById('toggle-team-form-btn');
   const teamFormEl = document.getElementById('team-form');
@@ -3194,7 +3505,9 @@ body::before {
       return { role: cb.value, count: count };
     });
     const channelVal = channelInput.value.trim();
-    const publisherId = state.myRoleId || '未知玩家';
+    const publisherId = playerProfile
+      ? playerProfile.roleId + (playerProfile.level ? ' Lv.' + playerProfile.level : '') + (playerProfile.class ? ' ' + playerProfile.class : '')
+      : (state.myRoleId || '未知玩家');
 
     if (roles.length === 0) { alert('請至少選擇一個空缺隊員！'); return; }
     if (!channelVal || parseInt(channelVal) < 1) { alert('請輸入有效的頻道號碼（正整數）！'); return; }
@@ -3275,13 +3588,26 @@ body::before {
       return;
     }
 
-    const filtered = currentFilter === 'all'
-      ? data
-      : data.filter(item => item.dungeon === currentFilter);
+    const filtered = (() => {
+      let items = data;
+      if (currentFilter === 'recruiting') items = items.filter(item => !item.status || item.status === 'recruiting');
+      else if (currentFilter === 'departed') items = items.filter(item => item.status === 'departed');
+      else if (currentFilter !== 'all') items = items.filter(item => item.dungeon === currentFilter);
+      return items;
+    })();
 
     lobbyEmpty.style.display = 'none';
     lobbyFilter.style.display = 'flex';
     lobbyList.style.display = 'flex';
+
+    if (filtered.length === 0) {
+      lobbyEmpty.style.display = 'block';
+      lobbyList.style.display = 'none';
+      lobbyFilter.querySelectorAll('.filter-chip').forEach(chip => {
+        chip.classList.toggle('active', chip.dataset.filter === currentFilter);
+      });
+      return;
+    }
 
     lobbyFilter.querySelectorAll('.filter-chip').forEach(chip => {
       chip.classList.toggle('active', chip.dataset.filter === currentFilter);
@@ -3305,17 +3631,26 @@ body::before {
       const expiring = timeLeft < EXPIRING;
 
       let joinBtnHTML;
-      if (isOwn) {
+      const isDeparted = item.status === 'departed';
+
+      if (isOwn && !isDeparted) {
+        joinBtnHTML = '<button class="depart-team-btn" data-id="' + item.id + '"><i class="ph ph-rocket-launch"></i> 出發</button>';
+      } else if (isOwn && isDeparted) {
         joinBtnHTML = '<span class="team-publisher">我的發布</span>';
-      } else if (isFull) {
-        joinBtnHTML = '<button class="join-team-btn" data-id="' + item.id + '" disabled><i class="ph ph-handshake"></i> 已滿</button>';
+      } else if (isFull || isDeparted) {
+        joinBtnHTML = '<button class="join-team-btn" data-id="' + item.id + '" disabled><i class="ph ph-handshake"></i> ' + (isDeparted ? '已出戰' : '已滿') + '</button>';
       } else {
         joinBtnHTML = '<button class="join-team-btn" data-id="' + item.id + '"><i class="ph ph-handshake"></i> 參加 (剩餘 ' + remaining + ' 位)</button>';
       }
 
+      const statusBadge = isDeparted
+        ? '<span class="team-status departed"><i class="ph ph-rocket-launch"></i> 已出戰</span>'
+        : '<span class="team-status recruiting"><i class="ph ph-hourglass-simple"></i> 等待組隊</span>';
+
       return '<div class="team-card' + (expiring ? ' expiring' : '') + (i === 0 ? ' highlight-card' : '') + '" data-id="' + item.id + '">' +
         '<div class="tc-top">' +
         '<span class="team-dungeon ' + (item.dungeon === '羅密歐' ? 'dungeon-romeo' : 'dungeon-juliet') + '">' + item.dungeon + '</span>' +
+        statusBadge +
         '<span class="team-channel"><i class="ph ph-broadcast"></i> CH.' + item.channel + '</span>' +
         '<span class="team-time">' + item.time + '</span>' +
         '</div>' +
@@ -3326,7 +3661,7 @@ body::before {
         '<div class="tc-bottom">' +
         '<div class="team-roles">' + roleTags + '</div>' +
         '<div class="tc-actions">' + joinBtnHTML +
-        (isOwn ? '<button class="delete-team-btn" data-id="' + item.id + '"><i class="ph ph-x-circle"></i></button>' : '') +
+        (isOwn && !isDeparted ? '<button class="delete-team-btn" data-id="' + item.id + '"><i class="ph ph-x-circle"></i></button>' : '') +
         '</div></div></div>';
     }).join('');
 
@@ -3351,6 +3686,15 @@ body::before {
       const { error } = await supabase.from('team_listings').delete().eq('id', parseInt(delBtn.dataset.id));
       if (error) console.error('Delete team_listings error:', error);
       currentFilter = 'all';
+      await renderTeamLobby();
+      return;
+    }
+    const departBtn = e.target.closest('.depart-team-btn');
+    if (departBtn) {
+      e.stopPropagation();
+      const id = parseInt(departBtn.dataset.id);
+      const { error } = await supabase.from('team_listings').update({ status: 'departed' }).eq('id', id);
+      if (error) console.error('Depart team_listings error:', error);
       await renderTeamLobby();
       return;
     }
