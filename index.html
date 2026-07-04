@@ -690,6 +690,15 @@ body::before {
 .role-tag.mage { background: rgba(59,130,246,0.15); color: #3b82f6; }
 .role-tag.thief { background: rgba(168,85,247,0.15); color: #a855f7; }
 
+.team-vacancy {
+  font-size: 12px;
+  color: #a78bfa;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+}
+
 .team-channel {
   font-size: 13px;
   font-weight: 600;
@@ -2276,6 +2285,7 @@ body::before {
             <button class="filter-chip" data-filter="打手"><i class="ph ph-sword"></i> 打手</button>
             <button class="filter-chip" data-filter="法師"><i class="ph ph-sparkle"></i> 法師</button>
             <button class="filter-chip" data-filter="盜賊"><i class="ph ph-eye"></i> 盜賊</button>
+            <button class="filter-chip" data-filter="推薦"><i class="ph ph-star"></i> 推薦</button>
           </div>
           <div class="lobby-list" id="lobby-list"></div>
         </div>
@@ -3659,14 +3669,13 @@ body::before {
     if (roles.length === 0) { alert('請至少選擇一個已有隊員！'); return; }
     if (!channelVal || parseInt(channelVal) < 1) { alert('請輸入有效的頻道號碼（正整數）！'); return; }
 
-    const totalTeamSize = roles.reduce((sum, r) => sum + (r.count || 1), 0);
     const id = Date.now() * 1000 + Math.floor(Math.random() * 1000);
     const insertPayload = {
       id: id,
       dungeon: dungeonVal,
       roles: roles,
       channel: channelVal,
-      max_players: totalTeamSize,
+      max_players: 4,
       publisher_id: publisherId,
       publisher_uid: state.myId,
       joined_players: [state.myId],
@@ -3750,6 +3759,21 @@ body::before {
           });
         });
       }
+      else if (currentFilter === '推薦') {
+        const myClass = (state.playerProfile && state.playerProfile.class) || '';
+        items = items.filter(item => {
+          const roles = item.roles || [];
+          const filled = {};
+          roles.forEach(r => {
+            const roleObj = typeof r === 'object' ? r : (typeof r === 'string' && r.startsWith('{') ? JSON.parse(r) : { role: r });
+            const rn = roleObj.role;
+            const ct = roleObj.count || 1;
+            filled[rn] = (filled[rn] || 0) + ct;
+          });
+          const need = { '打手': 2, '法師': 1, '盜賊': 1 };
+          return (need[myClass] || 0) > (filled[myClass] || 0) && (!item.status || item.status === 'recruiting');
+        });
+      }
       else if (currentFilter !== 'all') items = items.filter(item => item.dungeon === currentFilter);
       return items;
     })();
@@ -3785,6 +3809,22 @@ body::before {
         return '<span class="role-tag ' + cls + '">' + display + '</span>';
       }).join('');
 
+      const vacancy = (() => {
+        const filled = {};
+        (item.roles || []).forEach(r => {
+          let roleObj = r;
+          if (typeof r === 'string' && r.startsWith('{')) { try { roleObj = JSON.parse(r); } catch(e) {} }
+          const rn = typeof roleObj === 'object' ? roleObj.role : roleObj;
+          const ct = typeof roleObj === 'object' ? (roleObj.count || 1) : 1;
+          filled[rn] = (filled[rn] || 0) + ct;
+        });
+        const missing = [];
+        for (const [role, std] of Object.entries({ '打手': 2, '法師': 1, '盜賊': 1 })) {
+          const need = std - (filled[role] || 0);
+          if (need > 0) missing.push(role + ' x' + need);
+        }
+        return missing;
+      })();
       const joinedCount = (item.joined_players || []).length;
       const remaining = item.max_players - joinedCount;
       const isFull = remaining <= 0;
@@ -3799,8 +3839,8 @@ body::before {
 
       if (isOwn && !isDeparted && isFull) {
         joinBtnHTML = '<button class="depart-team-btn" data-id="' + item.id + '"><i class="ph ph-rocket-launch"></i> 出發</button>';
-      } else if (isOwn && isDeparted) {
-        joinBtnHTML = '<span class="team-publisher">我的發布</span>';
+      } else if (isOwn) {
+        joinBtnHTML = '<span class="team-publisher">' + (isDeparted ? '已出戰' : '我的發布') + '</span>';
       } else if (isFull || isDeparted) {
         joinBtnHTML = '<button class="join-team-btn" data-id="' + item.id + '" disabled><i class="ph ph-handshake"></i> ' + (isDeparted ? '已出戰' : '已滿') + '</button>';
       } else {
@@ -3824,6 +3864,7 @@ body::before {
         '</div>' +
         '<div class="tc-bottom">' +
         '<div class="team-roles">' + roleTags + '</div>' +
+        (vacancy.length ? '<div class="team-vacancy"><i class="ph ph-magnifying-glass"></i> 空缺：' + vacancy.join('、') + '</div>' : '') +
         '<div class="tc-actions">' + joinBtnHTML +
         (isOwn && !isDeparted ? '<button class="delete-team-btn" data-id="' + item.id + '"><i class="ph ph-x-circle"></i></button>' : '') +
         '</div></div></div>';
