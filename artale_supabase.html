@@ -108,6 +108,7 @@ body::before {
 .home-right {
   width: 380px;
   flex-shrink: 0;
+  margin-top: 40px;
 }
 
 .home-right .glass-card {
@@ -625,8 +626,8 @@ body::before {
   color: #60a5fa;
 }
 .team-dungeon.dungeon-juliet {
-  background: rgba(239,68,68,0.15);
-  color: #f87171;
+  background: rgba(234,179,8,0.15);
+  color: #facc15;
 }
 
 .team-roles {
@@ -3279,41 +3280,46 @@ body::before {
         (isOwn ? '<button class="delete-team-btn" data-id="' + item.id + '"><i class="ph ph-x-circle"></i></button>' : '') + '</div></div>';
     }).join('');
 
-    lobbyList.querySelectorAll('.delete-team-btn').forEach(btn => {
-      btn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        teamListings = teamListings.filter(item => item.id !== parseInt(this.dataset.id));
-        currentFilter = 'all';
-        renderTeamLobby();
-      });
-    });
 
-    lobbyList.querySelectorAll('.join-team-btn:not([disabled])').forEach(btn => {
-      btn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        const listingId = parseInt(this.dataset.id);
-        const listing = teamListings.find(item => item.id === listingId);
-        if (!listing) return;
-        if (state.myId === listing.publisherUid) return;
-        const myId = state.myRoleId || state.myId;
-        if (!listing.joinedPlayers) listing.joinedPlayers = [];
-        if (listing.joinedPlayers.includes(myId)) {
-          alert('你已經參加了這個隊伍！');
-          return;
-        }
-        if (listing.joinedPlayers.length >= listing.maxPlayers) {
-          alert('隊伍已滿！');
-          renderTeamLobby();
-          return;
-        }
-        listing.joinedPlayers.push(myId);
-        renderTeamLobby();
-      });
-    });
     setTimeout(function() {
       lobbyList.querySelectorAll('.highlight-card').forEach(function(el) { el.classList.remove('highlight-card'); });
     }, 600);
   }
+
+  // 組隊大廳事件委託（刪除 + 參加，只綁定一次）
+  lobbyList.addEventListener('click', function(e) {
+    // 刪除按鈕
+    const delBtn = e.target.closest('.delete-team-btn');
+    if (delBtn) {
+      e.stopPropagation();
+      teamListings = teamListings.filter(item => item.id !== parseInt(delBtn.dataset.id));
+      currentFilter = 'all';
+      renderTeamLobby();
+      return;
+    }
+    // 參加按鈕
+    const joinBtn = e.target.closest('.join-team-btn');
+    if (joinBtn && !joinBtn.disabled) {
+      e.stopPropagation();
+      const listingId = parseInt(joinBtn.dataset.id);
+      const listing = teamListings.find(item => item.id === listingId);
+      if (!listing) { console.log('join: listing not found', listingId); return; }
+      if (state.myId === listing.publisherUid) { console.log('join: own listing, skip'); return; }
+      const myId = state.myRoleId || state.myId;
+      if (!listing.joinedPlayers) listing.joinedPlayers = [];
+      if (listing.joinedPlayers.includes(myId)) {
+        alert('你已經參加了這個隊伍！');
+        return;
+      }
+      if (listing.joinedPlayers.length >= listing.maxPlayers) {
+        alert('隊伍已滿！');
+        renderTeamLobby();
+        return;
+      }
+      listing.joinedPlayers.push(myId);
+      renderTeamLobby();
+    }
+  });
 
   // C: 篩選按鈕事件
   lobbyFilter.addEventListener('click', (e) => {
