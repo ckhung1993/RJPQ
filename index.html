@@ -618,9 +618,13 @@ body::before {
   border-color: var(--primary);
 }
 
+.team-card.recruiting {
+  border-left: 3px solid #22c55e;
+}
+
 .team-card.departed {
-  border-left: 3px solid #a78bfa;
-  background: rgba(167,139,250,0.04);
+  border-left: 3px solid #ef4444;
+  background: rgba(239,68,68,0.04);
 }
 
 .tc-top {
@@ -974,8 +978,8 @@ body::before {
   color: #22c55e;
 }
 .team-status.departed {
-  background: rgba(167,139,250,0.15);
-  color: #a78bfa;
+  background: rgba(239,68,68,0.15);
+  color: #ef4444;
 }
 
 .highlight-card {
@@ -3884,7 +3888,7 @@ body::before {
         ? '<span class="team-status departed"><i class="ph ph-rocket-launch"></i> 已出戰</span>'
         : '<span class="team-status recruiting"><i class="ph ph-hourglass-simple"></i> 等待組隊</span>';
 
-      return '<div class="team-card' + (expiring ? ' expiring' : '') + (isDeparted ? ' departed' : '') + (i === 0 ? ' highlight-card' : '') + '" data-id="' + item.id + '">' +
+      return '<div class="team-card' + (expiring ? ' expiring' : '') + (isDeparted ? ' departed' : ' recruiting') + (i === 0 ? ' highlight-card' : '') + '" data-id="' + item.id + '">' +
         '<div class="tc-top">' +
         '<span class="team-dungeon ' + (item.dungeon === '羅密歐' ? 'dungeon-romeo' : 'dungeon-juliet') + '">' + item.dungeon + '</span>' +
         statusBadge +
