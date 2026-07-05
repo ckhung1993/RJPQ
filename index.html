@@ -2470,6 +2470,26 @@ body::before {
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxwY3B6cnNsc3BneGx5dW9kaG5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxNzgxNzAsImV4cCI6MjA5ODc1NDE3MH0.BvGzqcR9Z5YAfokEZhEon8bt3spIefxiCTwHautbZjQ';
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+  // 請求桌面通知權限
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+
+  // 發送出發通知
+  function sendDepartNotification(item) {
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+    const myId = state.myId;
+    const joined = item.joined_players || [];
+    if (item.publisher_uid === myId || !joined.includes(myId)) return;
+    if (state.notifiedDeparted.has(item.id)) return;
+    state.notifiedDeparted.add(item.id);
+    new Notification('【組隊出發】' + (item.publisher_id || '隊長') + ' 已出發', {
+      body: '副本：' + item.dungeon + '　頻道：CH.' + item.channel + '\n請儘快到達副本入口！',
+      icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🚀</text></svg>',
+      requireInteraction: true
+    });
+  }
+
   // ─── Constants ───
   const GRID_ROWS = 10;
   const GRID_COLS = 4;
@@ -2492,7 +2512,8 @@ body::before {
     errors: {},
     messages: [],
     grid: Array.from({ length: GRID_ROWS }, () => Array(GRID_COLS).fill(null)),
-    lastActivity: Date.now()
+    lastActivity: Date.now(),
+    notifiedDeparted: new Set()
   };
 
   let channel = null;
@@ -3880,6 +3901,11 @@ body::before {
     setTimeout(function() {
       lobbyList.querySelectorAll('.highlight-card').forEach(function(el) { el.classList.remove('highlight-card'); });
     }, 600);
+
+    // 出發通知：檢查是否有隊伍剛出發，且當前玩家是隊員
+    for (const item of data) {
+      if (item.status === 'departed') sendDepartNotification(item);
+    }
   }
 
   supabase
